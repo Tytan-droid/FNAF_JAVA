@@ -52,19 +52,19 @@ public abstrac_room getRoom(String room_name) {
 
 
     public Rooms_Graph Rooms_Graph_Builder(){
-        Room CAM1A = new Room(0, "CAM1A");
-        Room CAM1B = new Room(1, "CAM1B");
-        Room CAM1C = new Room(2, "CAM1C");
-        Room CAM2A = new Room(3, "CAM2A");
-        Room CAM2B = new Room(4, "CAM2B");
-        Room CAM3 = new Room(5, "CAM3");
-        Room CAM4A = new Room(6, "CAM4A");
-        Room CAM4B = new Room(7, "CAM4B");
-        Room CAM5 = new Room(8, "CAM5");
-        Room CAM6 = new Room(9, "CAM6");
-        Room CAM7 = new Room(10, "CAM7");
-        Room Door_Left = new Room(11, "Door_Left");
-        Room Door_Right = new Room(12, "Door_Right");
+        Room CAM1A = new Room(0, "CAM1A",4);
+        Room CAM1B = new Room(1, "CAM1B",3);
+        Room CAM1C = new Room(2, "CAM1C",3);
+        Room CAM2A = new Room(3, "CAM2A",2);
+        Room CAM2B = new Room(4, "CAM2B",1);
+        Room CAM3 = new Room(5, "CAM3",3);
+        Room CAM4A = new Room(6, "CAM4A",2);
+        Room CAM4B = new Room(7, "CAM4B",1);
+        Room CAM5 = new Room(8, "CAM5",4);
+        Room CAM6 = new Room(9, "CAM6",4);
+        Room CAM7 = new Room(10, "CAM7",4);
+        Room Door_Left = new Room(11, "Door_Left",0);
+        Room Door_Right = new Room(12, "Door_Right",0);
         Office You = new Office(13, "You");
 
         this.addNode(CAM1A);
@@ -97,5 +97,17 @@ public abstrac_room getRoom(String room_name) {
         this.addEdge(You, Door_Right);
 
         return this;
+    }
+
+    public abstrac_room approch_you(abstrac_room r){
+        abstrac_room rep=r;
+        int dist_min = r.get_dist();
+        for(abstrac_room r1: this.getNeighbors(r)){
+            if(r1.get_dist()<dist_min){
+                dist_min=r1.get_dist();
+                rep=r1;
+            }
+        }
+        return rep;
     }
 }

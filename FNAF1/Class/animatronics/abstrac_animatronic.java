@@ -41,6 +41,10 @@ public abstract class abstrac_animatronic {
             int size = rg.getNeighbors(r).size();
             n = rand.nextInt(size);
             this.set_id_room(rg.getNeighbors(r).get(n).get_name());
+            n=rand.nextInt(100);
+            if (n<=50+this.difficultie*2){
+                this.set_id_room(rg.approch_you(r).get_name());
+            }
             this.mvt_sound();
         }else if(this.get_etape_mvt()<4*60){
             this.set_etape_mvt(this.get_etape_mvt()+1);

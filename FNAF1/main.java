@@ -16,6 +16,7 @@ public class main {
     private static volatile boolean cam =false;
     private static volatile boolean light_left =false;
     private static volatile boolean light_right =false;
+    private static volatile int cam_id=0;
 
 
     private static volatile boolean running = true;
@@ -26,6 +27,9 @@ public class main {
     private static GamePanel panel;
     private static volatile int power_usage =1;
     private static volatile int power =1000*60;
+    private static final String[] CAMERA_IDS = new String[] {
+        "CAM1A","CAM1B","CAM1C","CAM2A","CAM2B","CAM3","CAM4A","CAM4B","CAM5","CAM6","CAM7"
+    };
 
     public static void main(String[] args) {
 
@@ -58,13 +62,29 @@ public class main {
                         remove_cam();
                     }else{
                         put_cam();
+                        remove_light(0);
+                        remove_light(1);
                     }
                 }else if(e.getKeyCode()==KeyEvent.VK_Q){
-                    turn_left();
-                    remove_light(1);
+                    if(cam){
+                        switch_cam_left();
+                    }else{
+                        turn_left();
+                        if(light_right){
+                            remove_light(1);
+                            put_light();
+                        }
+                    }
                 }else if(e.getKeyCode()==KeyEvent.VK_D){
-                    turn_right();
-                    remove_light(0);
+                    if(cam){
+                        switch_cam_right();
+                    }else{
+                        turn_right();
+                        if(light_left){
+                            remove_light(0);
+                            put_light();
+                        }
+                    }
                 }
             }
         });
@@ -73,14 +93,14 @@ public class main {
 
         public void mousePressed(java.awt.event.MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e)) {
-                remove_light(position);
+                put_light();
             } else if (SwingUtilities.isRightMouseButton(e)) {
-                
+                put_light();
             }
         }
         public void mouseReleased(java.awt.event.MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e)) {
-                put_light();
+                remove_light(position);
             }
         }
     });
@@ -122,6 +142,23 @@ public class main {
         return position;
     }
 
+    public static boolean isLightLeft(){
+        return light_left;
+    }
+
+    public static boolean isLightRight(){
+        return light_right;
+    }
+
+    public static boolean isCam(){
+        return cam;
+    }
+
+    public static String getCurrentCamera(){
+        if (cam_id >=0 && cam_id < CAMERA_IDS.length) return CAMERA_IDS[cam_id];
+        return CAMERA_IDS[0];
+    }
+
     private static void stop() {
         running = false;
     }
@@ -136,10 +173,12 @@ public class main {
     }
 
     private static void put_light(){
-        if(position==0){
-            light_left=true;
-        }else{
-            light_right=true;
+        if(!cam){
+            if(position==0){
+                light_left=true;
+            }else{
+                light_right=true;
+            }
         }
     }
     private static void remove_light(int pos){
@@ -156,5 +195,17 @@ public class main {
 
     private static void turn_right(){
         position=1;
+    }
+
+    private static void switch_cam_left(){
+        if (cam_id>0){
+            cam_id--;
+        }
+    }
+
+    private static void switch_cam_right(){
+        if (cam_id<10){
+            cam_id++;
+        }
     }
 }
