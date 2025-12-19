@@ -35,14 +35,17 @@ public abstract class abstrac_animatronic {
     public void move(Rooms_Graph rg){
         Random rand = new Random();
         int n = rand.nextInt(20) + 1;
-        if (this.get_etape_mvt()==4 && n<=this.get_difficultie() ){
+        if (this.get_etape_mvt()==4*60 && n<=this.get_difficultie() ){
             this.set_etape_mvt(0);
             abstrac_room r= rg.getRoom(this.get_id_room());
             int size = rg.getNeighbors(r).size();
             n = rand.nextInt(size);
             this.set_id_room(rg.getNeighbors(r).get(n).get_name());
-        }else if(this.get_etape_mvt()<4){
+            this.mvt_sound();
+        }else if(this.get_etape_mvt()<4*60){
             this.set_etape_mvt(this.get_etape_mvt()+1);
+        }else{
+            this.set_etape_mvt(0);
         }
     }
 
@@ -50,5 +53,9 @@ public abstract class abstrac_animatronic {
         if (this.get_id_room()=="You"){
             System.out.println("YOU ARE DEAD");
         }
+    }
+
+    public void mvt_sound(){
+        System.out.println("someone move");
     }
 }
