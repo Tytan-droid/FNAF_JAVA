@@ -1,10 +1,10 @@
-all: clean compile1 run1
+all: clean compile run
 
-compile1:
-	javac -d FNAF1/bin $(shell find . -name "*.java")
+compile:
+	javac -d FNAF1/bin $(shell find FNAF1 -name "*.java")
 
-run1:
-	java -cp FNAF1/bin main
+run:
+	java -cp FNAF1/bin Class.Main
 
 clean:
-	rm -rf FNAF*/bin
+	rm -rf FNAF1/bin

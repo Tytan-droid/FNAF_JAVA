@@ -1,4 +1,4 @@
-package Class.Rooms;
+package Class.rooms;
 
 import java.util.ArrayList;
 import java.util.HashMap;

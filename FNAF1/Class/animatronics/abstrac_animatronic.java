@@ -3,8 +3,8 @@ package Class.animatronics;
 import java.util.Random;
 
 import Class.SoundManager;
-import Class.Rooms.Rooms_Graph;
-import Class.Rooms.abstrac_room;
+import Class.rooms.Rooms_Graph;
+import Class.rooms.abstrac_room;
 
 public abstract class abstrac_animatronic {
     private String id_room;
@@ -70,7 +70,7 @@ public abstract class abstrac_animatronic {
     }
 
     public void mvt_sound(){
-        if(this.get_id_room().equals("CAM2B")||this.get_id_room().equals("CAM4B")){
+        if(this.get_id_room().equals("Door_Right")||this.get_id_room().equals("Door_Left")){
             SoundManager.play("Deep_Steps");    
         }
     }

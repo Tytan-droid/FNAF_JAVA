@@ -1,4 +1,4 @@
-package Class.Rooms;
+package Class.rooms;
 
 public abstract class abstrac_room {
     private int id;

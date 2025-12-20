@@ -3,7 +3,7 @@ package Class.animatronics;
 import java.util.ArrayList;
 import java.util.List;
 
-import Class.Rooms.Rooms_Graph;
+import Class.rooms.Rooms_Graph;
 
 public class L_animatronics {
     private List<abstrac_animatronic> la;
@@ -21,7 +21,7 @@ public class L_animatronics {
     }
 
     public void L_animatronics_Builder_n1(){
-        this.L_animatronics_Builder(0, 10, 10, 0);
+        this.L_animatronics_Builder(10, 10, 10, 0);
     }
 
     public void L_animatronics_Builder(int difficultie_freddy,int difficultie_bonnie,int difficultie_chica,int difficultie_foxy){

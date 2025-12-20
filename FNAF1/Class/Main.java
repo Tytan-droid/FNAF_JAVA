@@ -1,3 +1,4 @@
+package Class;
 import javax.swing.*;
 
 import org.w3c.dom.events.MouseEvent;
@@ -7,10 +8,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 
 import Class.animatronics.*;
+import Class.rooms.*;
 import Class.SoundManager;
-import Class.Rooms.*;
 
-public class main {
+public class Main {
 
     public static final int FPS = 60;
     private static final long FRAME_TIME = 1000 / FPS;
@@ -111,7 +112,7 @@ public class main {
         }
     });
 
-        new Thread(main::run).start();
+        new Thread(Main::run).start();
     }
 
     private static void run() {

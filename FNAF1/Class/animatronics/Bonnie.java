@@ -2,8 +2,8 @@ package Class.animatronics;
 
 import java.util.Random;
 
-import Class.Rooms.Rooms_Graph;
-import Class.Rooms.abstrac_room;
+import Class.rooms.Rooms_Graph;
+import Class.rooms.abstrac_room;
 
 public class Bonnie extends abstrac_animatronic {
     
@@ -19,8 +19,10 @@ public class Bonnie extends abstrac_animatronic {
             this.set_etape_mvt(0);
             abstrac_room r= rg.getRoom(this.get_id_room());
             int size = rg.getNeighbors(r).size();
-            n = rand.nextInt(size);
-            this.set_id_room(rg.getNeighbors(r).get(n).get_name());
+            if(size>0){
+                n = rand.nextInt(size);
+                this.set_id_room(rg.getNeighbors(r).get(n).get_name());
+            }
             n=rand.nextInt(100);
             if (n<=50+this.get_difficultie()){
                 this.set_id_room(rg.approch_you_left(r).get_name());
