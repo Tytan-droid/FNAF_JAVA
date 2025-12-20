@@ -21,11 +21,11 @@ public class L_animatronics {
     }
 
     public void L_animatronics_Builder_n1(){
-        this.L_animatronics_Builder(0, 3, 3, 0);
+        this.L_animatronics_Builder(0, 20, 20, 0);
     }
 
     public void L_animatronics_Builder(int difficultie_freddy,int difficultie_bonnie,int difficultie_chica,int difficultie_foxy){
-        Chica c = new Chica("CAM1A", difficultie_chica, 0);
+        Chica c = new Chica("CAM4A", difficultie_chica, 0);
         Bonnie b = new Bonnie("CAM1A", difficultie_bonnie, 0);
         Freddy f = new Freddy("CAM1A",difficultie_freddy,0);
 

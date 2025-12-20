@@ -52,8 +52,8 @@ public abstrac_room getRoom(String room_name) {
 
 
     public Rooms_Graph Rooms_Graph_Builder(){
-        Room CAM1A = new Room(0, "CAM1A",4);
-        Room CAM1B = new Room(1, "CAM1B",3);
+        Room CAM1A = new Room(0, "CAM1A",5);
+        Room CAM1B = new Room(1, "CAM1B",4);
         Room CAM1C = new Room(2, "CAM1C",3);
         Room CAM2A = new Room(3, "CAM2A",2);
         Room CAM2B = new Room(4, "CAM2B",1);
@@ -101,9 +101,20 @@ public abstrac_room getRoom(String room_name) {
 
     public abstrac_room approch_you(abstrac_room r){
         abstrac_room rep=r;
-        int dist_min = r.get_dist();
+        int dist_min = 10;
         for(abstrac_room r1: this.getNeighbors(r)){
             if(r1.get_dist()<dist_min){
+                dist_min=r1.get_dist();
+                rep=r1;
+            }
+        }
+        return rep;
+    }
+        public abstrac_room approch_you_left(abstrac_room r){
+        abstrac_room rep=r;
+        int dist_min = 10;
+        for(abstrac_room r1: this.getNeighbors(r)){
+            if(r1.get_dist()<dist_min && !r1.get_name().equals("CAM4A")){
                 dist_min=r1.get_dist();
                 rep=r1;
             }

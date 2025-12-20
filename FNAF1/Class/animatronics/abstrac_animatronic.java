@@ -35,6 +35,7 @@ public abstract class abstrac_animatronic {
     public void move(Rooms_Graph rg){
         Random rand = new Random();
         int n = rand.nextInt(20) + 1;
+        String id_room = this.get_id_room();
         if (this.get_etape_mvt()==4*60 && n<=this.get_difficultie() ){
             this.set_etape_mvt(0);
             abstrac_room r= rg.getRoom(this.get_id_room());
@@ -42,8 +43,14 @@ public abstract class abstrac_animatronic {
             n = rand.nextInt(size);
             this.set_id_room(rg.getNeighbors(r).get(n).get_name());
             n=rand.nextInt(100);
-            if (n<=50+this.difficultie*2){
+            if (n<=50+this.difficultie){
                 this.set_id_room(rg.approch_you(r).get_name());
+            }
+            if(id_room.equals("Door_Right") && !rg.getNeighbors(r).contains(rg.getRoom("You"))){
+                this.set_id_room("CAM1B");
+            }
+            if(id_room.equals("Door_Left") && !rg.getNeighbors(r).contains(rg.getRoom("You"))){
+                this.set_id_room("CAM1B");
             }
             this.mvt_sound();
         }else if(this.get_etape_mvt()<4*60){

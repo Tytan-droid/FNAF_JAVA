@@ -17,6 +17,9 @@ public class main {
     private static volatile boolean light_left =false;
     private static volatile boolean light_right =false;
     private static volatile int cam_id=0;
+    private static volatile boolean left_door_close=false;
+    private static volatile boolean right_door_close=false;
+
 
 
     private static volatile boolean running = true;
@@ -95,7 +98,7 @@ public class main {
             if (SwingUtilities.isLeftMouseButton(e)) {
                 put_light();
             } else if (SwingUtilities.isRightMouseButton(e)) {
-                put_light();
+                door(rg);
             }
         }
         public void mouseReleased(java.awt.event.MouseEvent e) {
@@ -142,6 +145,10 @@ public class main {
         return position;
     }
 
+    public static L_animatronics getAnimatronics(){
+        return L_a;
+    }
+
     public static boolean isLightLeft(){
         return light_left;
     }
@@ -173,12 +180,10 @@ public class main {
     }
 
     private static void put_light(){
-        if(!cam){
-            if(position==0){
-                light_left=true;
-            }else{
-                light_right=true;
-            }
+        if(position==0){
+            light_left=true;
+        }else{
+            light_right=true;
         }
     }
     private static void remove_light(int pos){
@@ -207,5 +212,60 @@ public class main {
         if (cam_id<10){
             cam_id++;
         }
+    }
+
+    private static volatile long lastBlink = 0;
+
+    public static void blinkCamera(int delayMs) {
+        long now = System.currentTimeMillis();
+        if (!cam) return;
+        if (now - lastBlink < 300) return;
+        lastBlink = now;
+
+        try {
+            if (panel != null) panel.startCameraBlackout(300);
+        } catch (Throwable ignored) {}
+    }
+
+    public static void close_left_door(Rooms_Graph rg){
+        power_usage++;
+        rg.removeEdge(rg.getRoom("You"),rg.getRoom("Door_Left"));
+        left_door_close=true;
+    }
+    public static void close_right_door(Rooms_Graph rg){
+        power_usage++;
+        rg.removeEdge(rg.getRoom("You"),rg.getRoom("Door_Right"));
+        right_door_close=true;
+    }
+    public static void open_right_door(Rooms_Graph rg){
+        power_usage--;
+        rg.addEdge(rg.getRoom("You"),rg.getRoom("Door_Right"));
+        right_door_close=false;
+    }
+    public static void open_left_door(Rooms_Graph rg){
+        power_usage--;
+        rg.addEdge(rg.getRoom("You"),rg.getRoom("Door_Left"));
+        left_door_close=false;
+    }
+    public static void door(Rooms_Graph rg){
+        if (position==0){
+            if (left_door_close){
+                open_left_door(rg);
+            }else{
+                close_left_door(rg);
+            }
+        }else{
+            if(right_door_close){
+                open_right_door(rg);
+            }else{
+                close_right_door(rg);
+            }
+        }
+    }
+    public boolean left_door_close(){
+        return left_door_close;
+    }
+    public boolean right_door_close(){
+        return left_door_close;
     }
 }
