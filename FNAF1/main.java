@@ -97,7 +97,7 @@ public class main {
         public void mousePressed(java.awt.event.MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e)) {
                 put_light();
-            } else if (SwingUtilities.isRightMouseButton(e)) {
+            } else if (SwingUtilities.isRightMouseButton(e) && !cam) {
                 door(rg);
             }
         }
@@ -262,10 +262,10 @@ public class main {
             }
         }
     }
-    public boolean left_door_close(){
+    public static boolean left_door_close(){
         return left_door_close;
     }
-    public boolean right_door_close(){
-        return left_door_close;
+    public static boolean right_door_close(){
+        return right_door_close;
     }
 }

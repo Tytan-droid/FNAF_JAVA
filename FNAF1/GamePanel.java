@@ -468,8 +468,30 @@ public class GamePanel extends JPanel {
                     } catch (Throwable ignored) {}
                 }
             }
-        } catch (Throwable ignored) {
-        }
+        } catch (Throwable ignored) {}
+
+        try {
+            boolean leftClose = main.left_door_close();
+            boolean rightClose = main.right_door_close();
+            int panelW = getWidth();
+            int panelH = getHeight();
+
+            if (leftClose && !main.isCam()) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+                g2.setColor(Color.GRAY);
+                g2.fillRect(panelW/12+90, panelH/2 - 100, panelW/30, 200);
+                g2.dispose();
+            }
+
+            if (rightClose && !main.isCam()) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+                g2.setColor(Color.GRAY);
+                g2.fillRect(panelW - panelW/3+90, panelH/2 - 100, panelW/30, 200);
+                g2.dispose();
+            }
+        } catch (Throwable ignored) {}
 
         try {
             boolean leftOn = main.isLightLeft();
@@ -477,7 +499,7 @@ public class GamePanel extends JPanel {
             int panelW = getWidth();
             int panelH = getHeight();
 
-            if (leftOn) {
+            if (leftOn && !main.isCam()) {
                 if (flashlightLeft != null) {
                     int w = panelW / 3;
                     int iw = flashlightLeft.getWidth(this);
@@ -490,14 +512,12 @@ public class GamePanel extends JPanel {
                     Graphics2D g2 = (Graphics2D) g.create();
                     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.06f));
                     g2.setColor(Color.YELLOW);
-                    int[] xs = { panelW/8, panelW/4, panelW/8 };
-                    int[] ys = { panelH/2 - 80, panelW/2, panelH/2 + 80 };
                     g2.fillOval(panelW/12, panelH/2 - 120, panelW/4, 240);
                     g2.dispose();
                 }
             }
 
-            if (rightOn) {
+            if (rightOn && !main.isCam()) {
                 if (flashlightRight != null) {
                     int w = panelW / 3;
                     int iw = flashlightRight.getWidth(this);
@@ -515,5 +535,7 @@ public class GamePanel extends JPanel {
                 }
             }
         } catch (Throwable ignored) {}
+
+
     }
 }

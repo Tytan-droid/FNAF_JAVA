@@ -7,7 +7,7 @@ public class Freddy extends abstrac_animatronic {
     }
     @Override
     public void kill(){
-        if (this.get_id_room().equals("CAM2B")||this.get_id_room().equals("CAM4B")) {
+        if ((this.get_id_room().equals("CAM2B"))||this.get_id_room().equals("CAM4B")) {
             System.out.println("YOU ARE DEAD");
         }
     }
