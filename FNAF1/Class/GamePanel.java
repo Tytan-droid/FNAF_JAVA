@@ -11,6 +11,7 @@ import Class.animatronics.abstrac_animatronic;
 import Class.animatronics.Chica;
 import Class.animatronics.Bonnie;
 import Class.animatronics.Freddy;
+import Class.animatronics.Foxy;
 import Class.animatronics.L_animatronics;
 
 public class GamePanel extends JPanel {
@@ -49,6 +50,7 @@ public class GamePanel extends JPanel {
         if (a instanceof Chica) baseName = "Chica";
         else if (a instanceof Bonnie) baseName = "Bonnie";
         else if (a instanceof Freddy) baseName = "Freddy";
+        else if (a instanceof Foxy) baseName = "Foxy";
         else baseName = null;
 
         Graphics2D g2 = (Graphics2D) g.create();
@@ -57,9 +59,8 @@ public class GamePanel extends JPanel {
         int dx = x - drawW/2 + (leftSide ? -targetW/6 : targetW/6);
         int dy = y - drawH/2;
 
-        boolean drawn = false;
         if (baseName != null) {
-            String side = leftSide ? "_Left" : "_Right";
+            String side = !leftSide ? "_Left" : "_Right";
             String key = baseName + side;
             Image animImg = animImages.get(key);
             if (animImg == null) {
@@ -80,30 +81,8 @@ public class GamePanel extends JPanel {
                 int ih = animImg.getHeight(this);
                 int drawHH = (iw > 0 && ih > 0) ? (int) ((double) drawW * ih / iw) : drawW;
                 g2.drawImage(animImg, dx, dy - (drawHH - drawH)/2, drawW, drawHH, this);
-                drawn = true;
             }
         }
-
-        if (!drawn) {
-            Color col = Color.WHITE;
-            String label = "?";
-            if (a instanceof Chica) { col = Color.YELLOW; label = "C"; }
-            else if (a instanceof Bonnie) { col = new Color(128, 0, 128); label = "B"; }
-            else if (a instanceof Freddy) { col = new Color(139, 69, 19); label = "F"; }
-
-            g2.setColor(new Color(0,0,0,160));
-            g2.fillOval(dx - 4, dy - 4, drawW + 8, drawH + 8);
-            g2.setColor(col);
-            g2.fillOval(dx, dy, drawW, drawH);
-            g2.setColor(Color.BLACK);
-            Font f = g2.getFont().deriveFont(Font.BOLD, (float)drawW/1.6f);
-            g2.setFont(f);
-            FontMetrics fm = g2.getFontMetrics(f);
-            int tx = dx + (drawW - fm.stringWidth(label)) / 2;
-            int ty = dy + (drawW + fm.getAscent()) / 2 - 2;
-            g2.drawString(label, tx, ty);
-        }
-
         g2.dispose();
     }
 
@@ -313,7 +292,7 @@ public class GamePanel extends JPanel {
                                 java.util.List<abstrac_animatronic> present = new java.util.ArrayList<>();
                                 for (abstrac_animatronic a : list) {
                                     if (a != null && camId.equals(a.get_id_room())) {
-                                        if (a instanceof Chica || a instanceof Bonnie || a instanceof Freddy) {
+                                        if (a instanceof Chica || a instanceof Bonnie || a instanceof Freddy || a instanceof Foxy) {
                                             present.add(a);
                                         }
                                     }
@@ -326,6 +305,7 @@ public class GamePanel extends JPanel {
                                         if (a instanceof Chica) baseName = "Chica";
                                         else if (a instanceof Bonnie) baseName = "Bonnie";
                                         else if (a instanceof Freddy) baseName = "Freddy";
+                                        else if (a instanceof Foxy) baseName = "Foxy";
                                         else baseName = null;
 
                                         int w = getWidth();
@@ -376,28 +356,6 @@ public class GamePanel extends JPanel {
                                                 g.drawImage(animImg, dx, dy, drawW, drawH, this);
                                                 drawn = true;
                                             }
-                                        }
-
-                                        if (!drawn) {
-                                            Color col = Color.WHITE;
-                                            String label = "?";
-                                            if (a instanceof Chica) { col = Color.YELLOW; label = "C"; }
-                                            else if (a instanceof Bonnie) { col = new Color(128, 0, 128); label = "B"; }
-                                            else if (a instanceof Freddy) { col = new Color(139, 69, 19); label = "F"; }
-
-                                            Graphics2D g2 = (Graphics2D) g.create();
-                                            g2.setColor(new Color(0,0,0,120));
-                                            g2.fillOval(x - 4, y - 4, markerSize + 8, markerSize + 8);
-                                            g2.setColor(col);
-                                            g2.fillOval(x, y, markerSize, markerSize);
-                                            g2.setColor(Color.BLACK);
-                                            Font f = g2.getFont().deriveFont(Font.BOLD, (float)markerSize/1.2f);
-                                            g2.setFont(f);
-                                            FontMetrics fm = g2.getFontMetrics(f);
-                                            int tx = x + (markerSize - fm.stringWidth(label)) / 2;
-                                            int ty = y + (markerSize + fm.getAscent()) / 2 - 2;
-                                            g2.drawString(label, tx, ty);
-                                            g2.dispose();
                                         }
                                     }
                                 }

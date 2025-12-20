@@ -21,17 +21,19 @@ public class L_animatronics {
     }
 
     public void L_animatronics_Builder_n1(){
-        this.L_animatronics_Builder(10, 10, 10, 0);
+        this.L_animatronics_Builder(10, 10, 10, 10);
     }
 
     public void L_animatronics_Builder(int difficultie_freddy,int difficultie_bonnie,int difficultie_chica,int difficultie_foxy){
         Chica c = new Chica("CAM1A", difficultie_chica, 0);
         Bonnie b = new Bonnie("CAM1A", difficultie_bonnie, 0);
         Freddy f = new Freddy("CAM1A",difficultie_freddy,0);
+        Foxy f2 = new Foxy("CAM1C", difficultie_foxy, 0);
 
         this.Add_animatronic(b);
         this.Add_animatronic(f);
         this.Add_animatronic(c);
+        this.Add_animatronic(f2);
     }
 
     public void move_all_animatronics(Rooms_Graph rg){

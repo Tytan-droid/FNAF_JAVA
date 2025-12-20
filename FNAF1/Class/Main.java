@@ -39,7 +39,6 @@ public class Main {
             "CAM4A","CAM4B","CAM5","CAM6","CAM7"
     };
 
-    // ===== COOLDOWNS =====
     private static final Map<String, Long> cooldowns = new HashMap<>();
 
     private static boolean canUse(String action, long cooldownMs) {
@@ -84,7 +83,7 @@ public class Main {
                 }
 
                 else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    if (!canUse("CAM_TOGGLE", 400)) return;
+                    if (!canUse("CAM_TOGGLE", 800)) return;
 
                     if (cam) {
                         remove_cam();
@@ -96,7 +95,7 @@ public class Main {
                 }
 
                 else if (e.getKeyCode() == KeyEvent.VK_Q) {
-                    if (!canUse("LEFT", 200)) return;
+                    if (!canUse("LEFT", 400)) return;
 
                     if (cam) {
                         switch_cam_left();
@@ -110,7 +109,7 @@ public class Main {
                 }
 
                 else if (e.getKeyCode() == KeyEvent.VK_D) {
-                    if (!canUse("RIGHT", 200)) return;
+                    if (!canUse("RIGHT", 400)) return;
 
                     if (cam) {
                         switch_cam_right();
@@ -137,7 +136,7 @@ public class Main {
                 }
 
                 else if (SwingUtilities.isRightMouseButton(e) && !cam) {
-                    if (canUse("DOOR", 500)) {
+                    if (canUse("DOOR", 300)) {
                         door(rg);
                     }
                 }
