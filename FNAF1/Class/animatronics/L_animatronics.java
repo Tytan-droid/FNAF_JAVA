@@ -29,9 +29,9 @@ public class L_animatronics {
         Bonnie b = new Bonnie("CAM1A", difficultie_bonnie, 0);
         Freddy f = new Freddy("CAM1A",difficultie_freddy,0);
 
-        this.Add_animatronic(c);
         this.Add_animatronic(b);
         this.Add_animatronic(f);
+        this.Add_animatronic(c);
     }
 
     public void move_all_animatronics(Rooms_Graph rg){

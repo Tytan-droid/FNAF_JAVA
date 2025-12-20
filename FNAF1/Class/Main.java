@@ -1,11 +1,12 @@
 package Class;
-import javax.swing.*;
 
-import org.w3c.dom.events.MouseEvent;
+import javax.swing.*;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
+import java.util.HashMap;
+import java.util.Map;
 
 import Class.animatronics.*;
 import Class.rooms.*;
@@ -15,28 +16,44 @@ public class Main {
 
     public static final int FPS = 60;
     private static final long FRAME_TIME = 1000 / FPS;
-    private static volatile boolean cam =false;
-    private static volatile boolean light_left =false;
-    private static volatile boolean light_right =false;
-    private static volatile int cam_id=0;
-    private static volatile boolean left_door_close=false;
-    private static volatile boolean right_door_close=false;
 
-
+    private static volatile boolean cam = false;
+    private static volatile boolean light_left = false;
+    private static volatile boolean light_right = false;
+    private static volatile int cam_id = 0;
+    private static volatile boolean left_door_close = false;
+    private static volatile boolean right_door_close = false;
 
     private static volatile boolean running = true;
-    private static volatile int position =0; //0 regarde à gauche et 1 regarde à droite
+    private static volatile int position = 0; // 0 gauche, 1 droite
 
     private static L_animatronics L_a;
     private static Rooms_Graph rg;
     private static GamePanel panel;
-    private static volatile int power_usage =1;
-    private static volatile int power =1000*60;
-    private static final String[] CAMERA_IDS = new String[] {
-        "CAM1A","CAM1B","CAM1C","CAM2A","CAM2B","CAM3","CAM4A","CAM4B","CAM5","CAM6","CAM7"
+
+    private static volatile int power_usage = 1;
+    private static volatile int power = 1000 * 60;
+
+    private static final String[] CAMERA_IDS = {
+            "CAM1A","CAM1B","CAM1C","CAM2A","CAM2B","CAM3",
+            "CAM4A","CAM4B","CAM5","CAM6","CAM7"
     };
 
+    // ===== COOLDOWNS =====
+    private static final Map<String, Long> cooldowns = new HashMap<>();
+
+    private static boolean canUse(String action, long cooldownMs) {
+        long now = System.currentTimeMillis();
+        long last = cooldowns.getOrDefault(action, 0L);
+        if (now - last >= cooldownMs) {
+            cooldowns.put(action, now);
+            return true;
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
+
         SoundManager.loadAll("FNAF1/Sounds");
         SoundManager.loop("Eerie ambience largesca");
 
@@ -58,36 +75,48 @@ public class Main {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-
         frame.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
+
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    stop();
-                }else if(e.getKeyCode()==KeyEvent.VK_SPACE){
-                    if(cam){
+                    if (canUse("ESC", 500)) stop();
+                }
+
+                else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                    if (!canUse("CAM_TOGGLE", 400)) return;
+
+                    if (cam) {
                         remove_cam();
-                    }else{
+                    } else {
                         put_cam();
                         remove_light(0);
                         remove_light(1);
                     }
-                }else if(e.getKeyCode()==KeyEvent.VK_Q){
-                    if(cam){
+                }
+
+                else if (e.getKeyCode() == KeyEvent.VK_Q) {
+                    if (!canUse("LEFT", 200)) return;
+
+                    if (cam) {
                         switch_cam_left();
-                    }else{
+                    } else {
                         turn_left();
-                        if(light_right){
+                        if (light_right) {
                             remove_light(1);
                             put_light();
                         }
                     }
-                }else if(e.getKeyCode()==KeyEvent.VK_D){
-                    if(cam){
+                }
+
+                else if (e.getKeyCode() == KeyEvent.VK_D) {
+                    if (!canUse("RIGHT", 200)) return;
+
+                    if (cam) {
                         switch_cam_right();
-                    }else{
+                    } else {
                         turn_right();
-                        if(light_left){
+                        if (light_left) {
                             remove_light(0);
                             put_light();
                         }
@@ -98,19 +127,29 @@ public class Main {
 
         frame.addMouseListener(new MouseAdapter() {
 
-        public void mousePressed(java.awt.event.MouseEvent e) {
-            if (SwingUtilities.isLeftMouseButton(e)) {
-                put_light();
-            } else if (SwingUtilities.isRightMouseButton(e) && !cam) {
-                door(rg);
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+
+                if (SwingUtilities.isLeftMouseButton(e) && !cam) {
+                    if (canUse("LIGHT_ON", 150)) {
+                        put_light();
+                    }
+                }
+
+                else if (SwingUtilities.isRightMouseButton(e) && !cam) {
+                    if (canUse("DOOR", 500)) {
+                        door(rg);
+                    }
+                }
             }
-        }
-        public void mouseReleased(java.awt.event.MouseEvent e) {
-            if (SwingUtilities.isLeftMouseButton(e)) {
-                remove_light(position);
+
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    remove_light(position);
+                }
             }
-        }
-    });
+        });
 
         new Thread(Main::run).start();
     }
@@ -131,95 +170,64 @@ public class Main {
                 } catch (InterruptedException ignored) {}
             }
         }
-
-        System.out.println("Game stopped");
         System.exit(0);
     }
 
     private static void update() {
         L_a.move_all_animatronics(rg);
-        power-=power_usage;
+        power -= power_usage;
     }
 
     private static void render() {
         if (panel != null) panel.repaint();
     }
 
-    public static int getPosition(){
-        return position;
-    }
+    public static int getPosition() { return position; }
+    public static L_animatronics getAnimatronics() { return L_a; }
+    public static boolean isLightLeft() { return light_left; }
+    public static boolean isLightRight() { return light_right; }
+    public static boolean isCam() { return cam; }
 
-    public static L_animatronics getAnimatronics(){
-        return L_a;
-    }
-
-    public static boolean isLightLeft(){
-        return light_left;
-    }
-
-    public static boolean isLightRight(){
-        return light_right;
-    }
-
-    public static boolean isCam(){
-        return cam;
-    }
-
-    public static String getCurrentCamera(){
-        if (cam_id >=0 && cam_id < CAMERA_IDS.length) return CAMERA_IDS[cam_id];
+    public static String getCurrentCamera() {
+        if (cam_id >= 0 && cam_id < CAMERA_IDS.length) return CAMERA_IDS[cam_id];
         return CAMERA_IDS[0];
     }
 
-    private static void stop() {
-        running = false;
-    }
+    private static void stop() { running = false; }
 
-    private static void put_cam(){
+    private static void put_cam() {
         SoundManager.play("fnaf-open-camera-sound");
         power_usage++;
         cam = true;
     }
-    private static void remove_cam(){
+
+    private static void remove_cam() {
         power_usage--;
         cam = false;
     }
 
-    private static void put_light(){
+    private static void put_light() {
         SoundManager.play("fnaf-light-sound");
-        if(position==0){
-            light_left=true;
-        }else{
-            light_right=true;
-        }
-    }
-    private static void remove_light(int pos){
-        if(pos==0){
-            light_left=false;
-        }else{
-            light_right=false;
-        }
+        if (position == 0) light_left = true;
+        else light_right = true;
     }
 
-    private static void turn_left(){
-        position=0;
+    private static void remove_light(int pos) {
+        if (pos == 0) light_left = false;
+        else light_right = false;
     }
 
-    private static void turn_right(){
-        position=1;
+    private static void turn_left() { position = 0; }
+    private static void turn_right() { position = 1; }
+
+    private static void switch_cam_left() {
+        SoundManager.play("fnaf2-camera");
+        cam_id = (cam_id > 0) ? cam_id - 1 : 10;
     }
 
-    private static void switch_cam_left(){
-        if (cam_id>0){
-            SoundManager.play("fnaf2-camera");
-            cam_id--;
-        }
-    }
-
-    private static void switch_cam_right(){
-        if (cam_id<10){
-            SoundManager.play("fnaf2-camera");
-            cam_id++;
-        }
+    private static void switch_cam_right() {
+        SoundManager.play("fnaf2-camera");
+        cam_id = (cam_id < 10) ? cam_id + 1 : 0;
     }
 
     private static volatile long lastBlink = 0;
@@ -229,59 +237,45 @@ public class Main {
         if (!cam) return;
         if (now - lastBlink < 300) return;
         lastBlink = now;
-
-        try {
-            if (panel != null) panel.startCameraBlackout(300);
-        } catch (Throwable ignored) {}
+        if (panel != null) panel.startCameraBlackout(300);
     }
 
-    public static void close_left_door(Rooms_Graph rg){
+    public static void close_left_door(Rooms_Graph rg) {
         SoundManager.play("door_slamming_fnaf_1_sound_effects");
         power_usage++;
-        rg.removeEdge(rg.getRoom("You"),rg.getRoom("Door_Left"));
-        left_door_close=true;
+        rg.removeEdge(rg.getRoom("You"), rg.getRoom("Door_Left"));
+        left_door_close = true;
     }
 
-    public static void close_right_door(Rooms_Graph rg){
+    public static void close_right_door(Rooms_Graph rg) {
         SoundManager.play("door_slamming_fnaf_1_sound_effects");
         power_usage++;
-        rg.removeEdge(rg.getRoom("You"),rg.getRoom("Door_Right"));
-        right_door_close=true;
+        rg.removeEdge(rg.getRoom("You"), rg.getRoom("Door_Right"));
+        right_door_close = true;
     }
 
-    public static void open_right_door(Rooms_Graph rg){
+    public static void open_right_door(Rooms_Graph rg) {
         power_usage--;
-        rg.addEdge(rg.getRoom("You"),rg.getRoom("Door_Right"));
-        right_door_close=false;
+        rg.addEdge(rg.getRoom("You"), rg.getRoom("Door_Right"));
+        right_door_close = false;
     }
 
-    public static void open_left_door(Rooms_Graph rg){
+    public static void open_left_door(Rooms_Graph rg) {
         power_usage--;
-        rg.addEdge(rg.getRoom("You"),rg.getRoom("Door_Left"));
-        left_door_close=false;
+        rg.addEdge(rg.getRoom("You"), rg.getRoom("Door_Left"));
+        left_door_close = false;
     }
 
-    public static void door(Rooms_Graph rg){
-        if (position==0){
-            if (left_door_close){
-                open_left_door(rg);
-            }else{
-                close_left_door(rg);
-            }
-        }else{
-            if(right_door_close){
-                open_right_door(rg);
-            }else{
-                close_right_door(rg);
-            }
+    public static void door(Rooms_Graph rg) {
+        if (position == 0) {
+            if (left_door_close) open_left_door(rg);
+            else close_left_door(rg);
+        } else {
+            if (right_door_close) open_right_door(rg);
+            else close_right_door(rg);
         }
     }
 
-    public static boolean left_door_close(){
-        return left_door_close;
-    }
-
-    public static boolean right_door_close(){
-        return right_door_close;
-    }
+    public static boolean left_door_close() { return left_door_close; }
+    public static boolean right_door_close() { return right_door_close; }
 }

@@ -1,6 +1,8 @@
 package Class;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +14,7 @@ import Class.animatronics.Freddy;
 import Class.animatronics.L_animatronics;
 
 public class GamePanel extends JPanel {
-
+    private Image camOverlay;
     private Image image;
     private Image guardLeft;
     private Image guardRight;
@@ -105,76 +107,34 @@ public class GamePanel extends JPanel {
         g2.dispose();
     }
 
-    private void drawAnimCentered(Graphics g, abstrac_animatronic a, boolean leftSide) {
-        if (a == null) return;
+    private void drawCameraOverlay(Graphics g) {
+        String camId = Main.getCurrentCamera();
+        BufferedImage camOverlay2 = loadImage("Cam_commun_overlay.png");
+        if (camOverlay != null) {
+            g.drawImage(camOverlay2, 0, 0, getWidth(), getHeight(), this);
+        }
+        camOverlay = loadImage(camId+"_interface.png");
+        if (camOverlay != null) {
+            g.drawImage(camOverlay, 0, 0, getWidth(), getHeight(), this);
+        }
+        g.setColor(new Color(0,0,0,40));
+        for (int y = 0; y < getHeight(); y += 4) {
+            g.fillRect(0, y, getWidth(), 1);
+        }
+    }
+
+    private BufferedImage loadImage(String name) {
         try {
-            System.out.println("Drawing centered anim: " + a.getClass().getSimpleName() + " room=" + a.get_id_room());
-        } catch (Throwable ignored) {}
-        String baseName;
-        if (a instanceof Chica) baseName = "Chica";
-        else if (a instanceof Bonnie) baseName = "Bonnie";
-        else if (a instanceof Freddy) baseName = "Freddy";
-        else baseName = null;
+            var url = getClass().getResource("/images/" + name);
+            if (url != null) return ImageIO.read(url);
+        } catch (IOException ignored) {}
 
-        int panelW = getWidth();
-        int panelH = getHeight();
-        int maxW = panelW / 3; 
-        int drawW = Math.max(40, maxW);
-        int drawH = drawW;
+        try {
+            File f = new File("FNAF1/Pictures/" + name);
+            if (f.exists()) return ImageIO.read(f);
+        } catch (IOException ignored) {}
 
-        Graphics2D g2 = (Graphics2D) g.create();
-        boolean drawn = false;
-        if (baseName != null) {
-            String side = leftSide ? "_Left" : "_Right";
-            String key = baseName + side;
-            Image animImg = animImages.get(key);
-            if (animImg == null) {
-                try {
-                    java.net.URL url = getClass().getResource("/images/" + key + ".png");
-                    if (url != null) animImg = ImageIO.read(url);
-                } catch (IOException ignored) {}
-                if (animImg == null) {
-                    try {
-                        java.io.File f = new java.io.File("FNAF1/Pictures/" + key + ".png");
-                        if (f.exists()) animImg = ImageIO.read(f);
-                    } catch (IOException ignored) {}
-                }
-                if (animImg != null) animImages.put(key, animImg);
-            }
-            if (animImg != null) {
-                int iw = animImg.getWidth(this);
-                int ih = animImg.getHeight(this);
-                drawH = (iw > 0 && ih > 0) ? (int) ((double) drawW * ih / iw) : drawW;
-                int dx = (panelW - drawW) / 2 + (leftSide ? -panelW/8 : panelW/8);
-                int dy = (panelH - drawH) / 2;
-                g2.drawImage(animImg, dx, dy, drawW, drawH, this);
-                drawn = true;
-            }
-        }
-
-        if (!drawn) {
-            Color col = Color.WHITE;
-            String label = "?";
-            if (a instanceof Chica) { col = Color.YELLOW; label = "C"; }
-            else if (a instanceof Bonnie) { col = new Color(128, 0, 128); label = "B"; }
-            else if (a instanceof Freddy) { col = new Color(139, 69, 19); label = "F"; }
-
-            int dx = (panelW - drawW) / 2 + (leftSide ? -panelW/8 : panelW/8);
-            int dy = (panelH - drawH) / 2;
-            g2.setColor(new Color(0,0,0,160));
-            g2.fillOval(dx - 6, dy - 6, drawW + 12, drawH + 12);
-            g2.setColor(col);
-            g2.fillOval(dx, dy, drawW, drawH);
-            g2.setColor(Color.BLACK);
-            Font f = g2.getFont().deriveFont(Font.BOLD, (float)drawW/1.6f);
-            g2.setFont(f);
-            FontMetrics fm = g2.getFontMetrics(f);
-            int tx = dx + (drawW - fm.stringWidth(label)) / 2;
-            int ty = dy + (drawW + fm.getAscent()) / 2 - 2;
-            g2.drawString(label, tx, ty);
-        }
-
-        g2.dispose();
+        return null;
     }
 
     public GamePanel() {
@@ -327,6 +287,7 @@ public class GamePanel extends JPanel {
                             g2.setColor(Color.BLACK);
                             g2.fillRect(0, 0, getWidth(), getHeight());
                             g2.dispose();
+                            drawCameraOverlay(g);
                             return;
                         }
                     }
@@ -443,30 +404,7 @@ public class GamePanel extends JPanel {
                             }
                         }
                     } catch (Throwable ignored) {}
-
-                    try {
-                        String txt = camId;
-                        Font orig = g.getFont();
-                        Font hudFont = orig.deriveFont(Font.BOLD, 18f);
-                        g.setFont(hudFont);
-                        FontMetrics fm = g.getFontMetrics(hudFont);
-                        int w = fm.stringWidth(txt);
-                        int h = fm.getHeight();
-                        int x = (getWidth() - w) / 2;
-                        int y = fm.getAscent() + 8;
-
-                        Color prev = g.getColor();
-                        g.setColor(new Color(0, 0, 0, 160));
-                        g.fillRoundRect(x - 12, 4, w + 24, h + 4, 10, 10);
-
-                        g.setColor(Color.BLACK);
-                        g.drawString(txt, x + 1, y + 1);
-                        g.setColor(Color.WHITE);
-                        g.drawString(txt, x, y);
-
-                        g.setFont(orig);
-                        g.setColor(prev);
-                    } catch (Throwable ignored) {}
+                    drawCameraOverlay(g);
                 }
             }
         } catch (Throwable ignored) {}
@@ -537,6 +475,6 @@ public class GamePanel extends JPanel {
             }
         } catch (Throwable ignored) {}
 
-
+        
     }
 }
