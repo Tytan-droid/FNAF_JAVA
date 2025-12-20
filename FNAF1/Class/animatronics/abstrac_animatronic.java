@@ -2,6 +2,7 @@ package Class.animatronics;
 
 import java.util.Random;
 
+import Class.SoundManager;
 import Class.Rooms.Rooms_Graph;
 import Class.Rooms.abstrac_room;
 
@@ -40,8 +41,10 @@ public abstract class abstrac_animatronic {
             this.set_etape_mvt(0);
             abstrac_room r= rg.getRoom(this.get_id_room());
             int size = rg.getNeighbors(r).size();
-            n = rand.nextInt(size);
-            this.set_id_room(rg.getNeighbors(r).get(n).get_name());
+            if(size>0){
+                n = rand.nextInt(size);
+                this.set_id_room(rg.getNeighbors(r).get(n).get_name());
+            }
             n=rand.nextInt(100);
             if (n<=50+this.difficultie){
                 this.set_id_room(rg.approch_you(r).get_name());
@@ -61,12 +64,14 @@ public abstract class abstrac_animatronic {
     }
 
     public void kill(){
-        if (this.get_id_room()=="You"){
+        if (this.get_id_room().equals("You")){
             System.out.println("YOU ARE DEAD");
         }
     }
 
     public void mvt_sound(){
-        System.out.println("someone move");
+        if(this.get_id_room().equals("CAM2B")||this.get_id_room().equals("CAM4B")){
+            SoundManager.play("Deep_Steps");    
+        }
     }
 }

@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 
 import Class.animatronics.*;
+import Class.SoundManager;
 import Class.Rooms.*;
 
 public class main {
@@ -35,6 +36,8 @@ public class main {
     };
 
     public static void main(String[] args) {
+        SoundManager.loadAll("FNAF1/Sounds");
+        SoundManager.loop("Eerie ambience largesca");
 
         L_a = new L_animatronics();
         L_a.L_animatronics_Builder_n1();
@@ -171,6 +174,7 @@ public class main {
     }
 
     private static void put_cam(){
+        SoundManager.play("fnaf-open-camera-sound");
         power_usage++;
         cam = true;
     }
@@ -180,6 +184,7 @@ public class main {
     }
 
     private static void put_light(){
+        SoundManager.play("fnaf-light-sound");
         if(position==0){
             light_left=true;
         }else{
@@ -204,12 +209,14 @@ public class main {
 
     private static void switch_cam_left(){
         if (cam_id>0){
+            SoundManager.play("fnaf2-camera");
             cam_id--;
         }
     }
 
     private static void switch_cam_right(){
         if (cam_id<10){
+            SoundManager.play("fnaf2-camera");
             cam_id++;
         }
     }
@@ -228,25 +235,31 @@ public class main {
     }
 
     public static void close_left_door(Rooms_Graph rg){
+        SoundManager.play("door_slamming_fnaf_1_sound_effects");
         power_usage++;
         rg.removeEdge(rg.getRoom("You"),rg.getRoom("Door_Left"));
         left_door_close=true;
     }
+
     public static void close_right_door(Rooms_Graph rg){
+        SoundManager.play("door_slamming_fnaf_1_sound_effects");
         power_usage++;
         rg.removeEdge(rg.getRoom("You"),rg.getRoom("Door_Right"));
         right_door_close=true;
     }
+
     public static void open_right_door(Rooms_Graph rg){
         power_usage--;
         rg.addEdge(rg.getRoom("You"),rg.getRoom("Door_Right"));
         right_door_close=false;
     }
+
     public static void open_left_door(Rooms_Graph rg){
         power_usage--;
         rg.addEdge(rg.getRoom("You"),rg.getRoom("Door_Left"));
         left_door_close=false;
     }
+
     public static void door(Rooms_Graph rg){
         if (position==0){
             if (left_door_close){
@@ -262,9 +275,11 @@ public class main {
             }
         }
     }
+
     public static boolean left_door_close(){
         return left_door_close;
     }
+
     public static boolean right_door_close(){
         return right_door_close;
     }
