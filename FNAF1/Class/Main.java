@@ -38,8 +38,7 @@ public class Main {
 
     private static long nightStartTime;
     private static final int SECONDS_PER_HOUR = 30;
-
-
+    private static int currentNight = 1;
 
     private static volatile int power_usage = 1;
     private static volatile int power = 1000 * 60;
@@ -78,6 +77,7 @@ public class Main {
 
     public static void main(String[] args) {
         SoundManager.loadAll("FNAF1/Sounds");
+        currentNight = SaveManager.loadNight();
         initialise_menu();
     }
 
@@ -96,6 +96,12 @@ public class Main {
         SoundManager.loop("Eerie ambience largesca");
         L_a = new L_animatronics();
         if (num == 1) L_a.L_animatronics_Builder_n1();
+        if (num == 2) L_a.L_animatronics_Builder_n2();
+        if (num == 3) L_a.L_animatronics_Builder_n3();
+        if (num == 4) L_a.L_animatronics_Builder_n4();
+        if (num == 5) L_a.L_animatronics_Builder_n5();
+        if (num == 6) L_a.L_animatronics_Builder_n6();
+
         rg = new Rooms_Graph();
         rg.Rooms_Graph_Builder();
         gameFrame = new JFrame("FNAF");
@@ -183,7 +189,7 @@ public class Main {
 
     private static void update() {
         L_a.move_all_animatronics(rg);
-        power -= power_usage*2;
+        power -= power_usage*(2.5);
         if(power<60){
             gameOver();
         }else if(getHour()>=6){
@@ -292,7 +298,7 @@ public class Main {
     }
 
     public static void initialise_menu() {
-        int nightNumber = 1;
+        int nightNumber = currentNight;
 
         if (menuFrame != null) return;
 
@@ -439,6 +445,10 @@ public class Main {
 
     if (!running) return;
     running = false;
+    if (currentNight < 6) {
+        currentNight++;
+        SaveManager.saveNight(currentNight);
+    }
 
     SoundManager.stopAll();
     SoundManager.play("fnaf-chimes");
