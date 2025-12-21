@@ -36,9 +36,8 @@ public class Main {
     private static JFrame gameOverFrame;
     private static JFrame winFrame;
 
-
     private static long nightStartTime;
-    private static final int SECONDS_PER_HOUR = 3q0;
+    private static final int SECONDS_PER_HOUR = 30;
 
 
 
