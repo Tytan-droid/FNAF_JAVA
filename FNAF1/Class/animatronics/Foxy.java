@@ -33,6 +33,14 @@ public class Foxy extends abstrac_animatronic {
         if (Main.isCam() && Main.getCurrentCamera().equals(id_room)&& id_room.equals("CAM1C")){
             this.set_etape_mvt(0);
         }
+        if(this.get_etape_mvt()==7*60){
+            this.set_id_room("CAM1C");
+        }else if(this.get_id_room().equals("Door_Left")){
+                if(rg.getNeighbors(rg.getRoom("Door_Left")).contains(rg.getRoom("You"))){
+                    this.set_id_room("You");
+                    this.kill();
+            }
+        }
     }
 
     public void run(Rooms_Graph rg){
@@ -40,6 +48,7 @@ public class Foxy extends abstrac_animatronic {
             this.set_id_room("CAM1C");
             this.set_etape_mvt(0);
             SoundManager.play("Foxy_Pound_Test");
+            this.set_id_room("Door_Left");
         }else{
             this.set_id_room("You");
             this.kill();
