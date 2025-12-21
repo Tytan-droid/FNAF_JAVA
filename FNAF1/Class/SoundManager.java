@@ -56,13 +56,26 @@ public class SoundManager {
 
     public static void loop(String name) {
         Clip clip = sounds.get(name.toLowerCase());
-        if (clip != null)
-            clip.loop(Clip.LOOP_CONTINUOUSLY);
+        if (clip == null) return;
+        clip.stop();
+        clip.setFramePosition(0);
+        clip.loop(Clip.LOOP_CONTINUOUSLY);
     }
+
 
     public static void stop(String name) {
         Clip clip = sounds.get(name.toLowerCase());
         if (clip != null)
             clip.stop();
     }
+
+    public static void stopAll() {
+        for (Clip clip : sounds.values()) {
+            if (clip != null && clip.isRunning()) {
+                clip.stop();
+            }
+        }
+    }
+
+
 }

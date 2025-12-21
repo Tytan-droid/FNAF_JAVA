@@ -432,7 +432,61 @@ public class GamePanel extends JPanel {
                 }
             }
         } catch (Throwable ignored) {}
+        try {
+            Graphics2D g2 = (Graphics2D) g.create();
 
-        
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+            int power = Main.getPower();
+            int powerPercent = Math.max(0, power / 600);
+
+            if (powerPercent > 30) {
+                g2.setColor(Color.GREEN);
+            } else if (powerPercent > 10) {
+                g2.setColor(Color.ORANGE);
+            } else {
+                g2.setColor(Color.RED);
+            }
+
+            g2.setFont(new Font("Arial", Font.BOLD, 16));
+
+            String text = "Power: " + powerPercent + "%";
+
+            int x = 15;
+            int y = getHeight() - 50;
+
+            g2.drawString(text, x, y);
+
+            int power_usage = Main.getPowerUsage();
+            g2.setColor(Color.WHITE);
+            String text2 = "Power Usage: " + power_usage;
+            g2.drawString(text2, x, y+20);
+
+
+            g2.dispose();
+        } catch (Throwable ignored) {}
+
+        try {
+            Graphics2D g2 = (Graphics2D) g.create();
+
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+            g2.setFont(new Font("Arial", Font.BOLD, 32));
+            g2.setColor(Color.WHITE);
+
+            String hourText = Main.getHourString();
+
+            FontMetrics fm = g2.getFontMetrics();
+            int textWidth = fm.stringWidth(hourText);
+
+            int x = getWidth() - textWidth - 30;
+            int y =50;
+
+            g2.drawString(hourText, x, y);
+            g2.dispose();
+        } catch (Throwable ignored) {}
+
     }
 }

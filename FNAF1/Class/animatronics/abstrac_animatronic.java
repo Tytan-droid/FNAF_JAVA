@@ -2,6 +2,7 @@ package Class.animatronics;
 
 import java.util.Random;
 
+import Class.Main;
 import Class.SoundManager;
 import Class.rooms.Rooms_Graph;
 import Class.rooms.abstrac_room;
@@ -66,6 +67,7 @@ public abstract class abstrac_animatronic {
     public void kill(){
         if (this.get_id_room().equals("You")){
             System.out.println("YOU ARE DEAD");
+            Main.gameOver();
         }
     }
 

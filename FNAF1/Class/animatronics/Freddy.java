@@ -16,6 +16,7 @@ public class Freddy extends abstrac_animatronic {
     public void kill(){
         if ((this.get_id_room().equals("Door_Left"))||this.get_id_room().equals("Door_Right")) {
             System.out.println("YOU ARE DEAD");
+            Main.gameOver();
         }
     }
     @Override
