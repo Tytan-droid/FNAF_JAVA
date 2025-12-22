@@ -83,8 +83,7 @@ public class SoundManager {
         "downloads_p20UxnT",
         "five-nights-at-freddys-foxys-song-youtube2",
         "Circus",
-        "creepy-kid-laugh-fnaf",
-        "fnaf-in-real-time"
+        "creepy-kid-laugh-fnaf"
     };
 
     String sound = sounds[(int)(Math.random() * sounds.length)];
