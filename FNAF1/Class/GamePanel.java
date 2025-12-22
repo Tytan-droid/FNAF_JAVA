@@ -12,6 +12,7 @@ import Class.animatronics.Chica;
 import Class.animatronics.Bonnie;
 import Class.animatronics.Freddy;
 import Class.animatronics.Foxy;
+import Class.animatronics.Golden_Freddy;
 import Class.animatronics.L_animatronics;
 
 public class GamePanel extends JPanel {
@@ -65,6 +66,7 @@ public class GamePanel extends JPanel {
         else if (a instanceof Bonnie) baseName = "Bonnie";
         else if (a instanceof Freddy) baseName = "Freddy";
         else if (a instanceof Foxy) baseName = "Foxy";
+        else if (a instanceof Golden_Freddy) baseName = "Golden_Freddy";
         else baseName = null;
 
         Graphics2D g2 = (Graphics2D) g.create();
@@ -79,15 +81,9 @@ public class GamePanel extends JPanel {
             Image animImg = animImages.get(key);
             if (animImg == null) {
                 try {
-                    java.net.URL url = getClass().getResource("/images/" + key + ".png");
-                    if (url != null) animImg = ImageIO.read(url);
+                    java.io.File f = new java.io.File("FNAF1/Pictures/" + key + ".png");
+                    if (f.exists()) animImg = ImageIO.read(f);
                 } catch (IOException ignored) {}
-                if (animImg == null) {
-                    try {
-                        java.io.File f = new java.io.File("FNAF1/Pictures/" + key + ".png");
-                        if (f.exists()) animImg = ImageIO.read(f);
-                    } catch (IOException ignored) {}
-                }
                 if (animImg != null) animImages.put(key, animImg);
             }
             if (animImg != null) {
@@ -315,7 +311,7 @@ public class GamePanel extends JPanel {
                                 java.util.List<abstrac_animatronic> present = new java.util.ArrayList<>();
                                 for (abstrac_animatronic a : list) {
                                     if (a != null && camId.equals(a.get_id_room())) {
-                                        if (a instanceof Chica || a instanceof Bonnie || a instanceof Freddy || a instanceof Foxy) {
+                                        if (a instanceof Chica || a instanceof Bonnie || a instanceof Freddy || a instanceof Foxy|| a instanceof Golden_Freddy) {
                                             present.add(a);
                                         }
                                     }
@@ -329,6 +325,7 @@ public class GamePanel extends JPanel {
                                         else if (a instanceof Bonnie) baseName = "Bonnie";
                                         else if (a instanceof Freddy) baseName = "Freddy";
                                         else if (a instanceof Foxy) baseName = "Foxy";
+                                        else if (a instanceof Golden_Freddy) baseName = "Golden_Freddy";
                                         else baseName = null;
 
                                         int w = getWidth();
@@ -356,15 +353,9 @@ public class GamePanel extends JPanel {
                                             Image animImg = animImages.get(key);
                                             if (animImg == null) {
                                                 try {
-                                                    java.net.URL url = getClass().getResource("/images/" + key + ".png");
-                                                    if (url != null) animImg = ImageIO.read(url);
+                                                    java.io.File f = new java.io.File("FNAF1/Pictures/" + key + ".png");
+                                                    if (f.exists()) animImg = ImageIO.read(f);
                                                 } catch (IOException ignored) {}
-                                                if (animImg == null) {
-                                                    try {
-                                                        java.io.File f = new java.io.File("FNAF1/Pictures/" + key + ".png");
-                                                        if (f.exists()) animImg = ImageIO.read(f);
-                                                    } catch (IOException ignored) {}
-                                                }
                                                 if (animImg != null) animImages.put(key, animImg);
                                             }
 
@@ -479,6 +470,8 @@ public class GamePanel extends JPanel {
             g2.drawString(text, x, y);
 
             int power_usage = Main.getPowerUsage();
+            power_usage = Math.max(1, power_usage);
+
             g2.setColor(Color.WHITE);
             String text2 = "Power Usage: " + power_usage;
             g2.drawString(text2, x, y+20);
@@ -527,6 +520,28 @@ public class GamePanel extends JPanel {
             repaint();
             return;
         }
+        for (abstrac_animatronic a : list) {
+            if (a instanceof Golden_Freddy && !Main.isCam()&& a.get_is_here()) {
+                String side ="_Right";
+                String key = "Golden_Freddy" + side;
+                Image animImg = animImages.get(key);
+                if (animImg == null) {
+                    try {
+                        java.io.File f = new java.io.File("FNAF1/Pictures/" + key + ".png");
+                        if (f.exists()) animImg = ImageIO.read(f);
+                    } catch (IOException ignored) {}
+                    if (animImg != null) animImages.put(key, animImg);
+                }
+
+                if (animImg != null) {
+                    int targetW = getWidth() / 10;
+                    int targetH = targetW;
+                    int dx = 300;
+                    int dy = getHeight()-160;
+                    drawAnimAtGuard(g, a, dx, dy, (int)(targetW * 1.5), (int)(targetH * 1.5), true);
+                }
+            }
+        }
     }
 
     public void jumpscare(Graphics g, abstrac_animatronic a) {
@@ -540,23 +555,30 @@ public class GamePanel extends JPanel {
 
         int targetW = getWidth() / 10;
         int targetH = targetW;
+        boolean fromLeft = a.get_coter() == 0;
 
-        int finalX = (getWidth() - targetW) / 2;
+        int finalX = (getWidth() - targetW) / 2 + (fromLeft? targetW/2+15:-targetW/2+50);
         int finalY = (getHeight() - targetH) / 2+20;
 
-        boolean fromLeft = a.get_coter() == 0;
 
         int startX = fromLeft
                 ? finalX - targetW / 4 - 200 
                 : finalX + targetW / 4 + 300;
+        int startY=finalY;
+
+        if(a instanceof Golden_Freddy){
+            startX=300;
+            startY=getHeight()-160;
+        }
 
         int x = (int) (startX + (finalX - startX) * t);
+        int y = (int) (startY + (finalY - startY) * t);
 
         drawAnimAtGuard(
             g,
             a,
             x,
-            finalY,
+            y,
             (int)(targetW * 1.5),
             (int)(targetH * 1.5),
             fromLeft

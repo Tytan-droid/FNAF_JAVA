@@ -95,5 +95,8 @@ public abstract class abstrac_animatronic {
         }
     }
 
+    public boolean get_is_here(){
+        return true;
+    }
 }
 
