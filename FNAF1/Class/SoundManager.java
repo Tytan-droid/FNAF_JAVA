@@ -77,5 +77,18 @@ public class SoundManager {
         }
     }
 
+    public static void playRandomAmbience() {
+    String[] sounds = {
+        "foxy-dum-dum-movie_QqCMzwk",
+        "downloads_p20UxnT",
+        "five-nights-at-freddys-foxys-song-youtube2",
+        "Circus",
+        "creepy-kid-laugh-fnaf",
+        "fnaf-in-real-time"
+    };
+
+    String sound = sounds[(int)(Math.random() * sounds.length)];
+    SoundManager.play(sound);
+}
 
 }

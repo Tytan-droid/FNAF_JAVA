@@ -33,11 +33,15 @@ public class L_animatronics {
         this.L_animatronics_Builder(5, 8, 7, 5, 1);
     }
     public void L_animatronics_Builder_n5(){
-        this.L_animatronics_Builder(10, 11, 11, 7, 3);
+        this.L_animatronics_Builder(7, 11, 11, 7, 3);
     }
     public void L_animatronics_Builder_n6(){
-        this.L_animatronics_Builder(20, 20, 20, 20, 20);
+        this.L_animatronics_Builder(11, 14, 14, 8, 5);
     }
+    public void L_animatronics_Builder_custom(int[] dif){
+        this.L_animatronics_Builder(dif[0], dif[1], dif[2], dif[3], dif[4]);
+    }
+
 
     public void L_animatronics_Builder(int difficultie_freddy,int difficultie_bonnie,int difficultie_chica,int difficultie_foxy, int difficultie_golden_freddy){
         Chica c = new Chica("CAM1A", difficultie_chica, 0);

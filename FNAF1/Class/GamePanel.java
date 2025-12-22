@@ -11,6 +11,7 @@ import Class.animatronics.abstrac_animatronic;
 import Class.animatronics.Chica;
 import Class.animatronics.Bonnie;
 import Class.animatronics.Freddy;
+import Class.animatronics.Freddy_Eyes;
 import Class.animatronics.Foxy;
 import Class.animatronics.Golden_Freddy;
 import Class.animatronics.L_animatronics;
@@ -42,6 +43,17 @@ public class GamePanel extends JPanel {
     private static final int SHAKE_DURATION = 300;
     private static final int SHAKE_INTENSITY = 18;
 
+    private boolean powerOutAnim = false;
+    private float darkness = 0f;
+
+    private float eyesGlow = 0.0f;
+    private boolean glowUp = true;
+
+    private boolean eyesVisible = true;
+    private long lastBlink = System.currentTimeMillis();
+
+
+
 
     public void startCameraBlackout(int ms) {
         blackoutDuration = Math.max(0, ms);
@@ -67,6 +79,7 @@ public class GamePanel extends JPanel {
         else if (a instanceof Freddy) baseName = "Freddy";
         else if (a instanceof Foxy) baseName = "Foxy";
         else if (a instanceof Golden_Freddy) baseName = "Golden_Freddy";
+        else if (a instanceof Freddy_Eyes) baseName = "Freddy_Eyes";
         else baseName = null;
 
         Graphics2D g2 = (Graphics2D) g.create();
@@ -311,7 +324,7 @@ public class GamePanel extends JPanel {
                                 java.util.List<abstrac_animatronic> present = new java.util.ArrayList<>();
                                 for (abstrac_animatronic a : list) {
                                     if (a != null && camId.equals(a.get_id_room())) {
-                                        if (a instanceof Chica || a instanceof Bonnie || a instanceof Freddy || a instanceof Foxy|| a instanceof Golden_Freddy) {
+                                        if (a instanceof Chica || a instanceof Bonnie || a instanceof Freddy || a instanceof Foxy|| a instanceof Golden_Freddy|| a instanceof Freddy_Eyes) {
                                             present.add(a);
                                         }
                                     }
@@ -326,6 +339,7 @@ public class GamePanel extends JPanel {
                                         else if (a instanceof Freddy) baseName = "Freddy";
                                         else if (a instanceof Foxy) baseName = "Foxy";
                                         else if (a instanceof Golden_Freddy) baseName = "Golden_Freddy";
+                                        else if (a instanceof Freddy_Eyes) baseName = "Freddy_Eyes";
                                         else baseName = null;
 
                                         int w = getWidth();
@@ -443,6 +457,58 @@ public class GamePanel extends JPanel {
                 }
             }
         } catch (Throwable ignored) {}
+
+        if (glowUp) {
+            eyesGlow += 0.30f;
+            if (eyesGlow >= 1.2f) glowUp = false;
+        } else {
+            eyesGlow -= 0.30f;
+            if (eyesGlow <= 0.3f) glowUp = true;
+        }
+
+        long now = System.currentTimeMillis();
+        if (eyesVisible && Math.random() < 0.005) {
+            eyesVisible = false;
+            lastBlink = now;
+        }
+
+        if (!eyesVisible && now - lastBlink > 120) {
+            eyesVisible = true;
+        }
+
+        if (powerOutAnim) {
+            if (eyesVisible && freddyEyesActive) {
+                Graphics2D g2 = (Graphics2D) g.create();
+
+                g2.setComposite(
+                    AlphaComposite.getInstance(
+                        AlphaComposite.SRC_OVER, eyesGlow * 0.8f
+                    )
+                );
+                int targetW = getWidth() / 10;
+                int x = (getWidth() - targetW) / 2;
+                int y = (getHeight() - targetW) / 2;
+                int targetH = targetW;
+                g2.setColor(new Color(255, 255, 180));
+
+                abstrac_animatronic a=new Freddy_Eyes("Door_Left", 20, 0);
+                abstrac_animatronic b=new Freddy("Door_Left", 20, 0);
+                drawAnimAtGuard(g2, b, x - targetW / 4 - 200, y + 20, (int) (targetW * 1.5), (int) (targetH * 1.5), true);
+                drawAnimAtGuard(g2, a, x - targetW / 4 - 200, y + 20, (int) (targetW * 1.5), (int) (targetH * 1.5), true);
+                g2.setComposite(AlphaComposite.SrcOver);
+                g2.dispose();
+            }
+
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setComposite(
+                AlphaComposite.getInstance(
+                    AlphaComposite.SRC_OVER, darkness
+                )
+            );
+            g2.setColor(Color.BLACK);
+            g2.fillRect(0, 0, getWidth(), getHeight());
+        }
+
         try {
             Graphics2D g2 = (Graphics2D) g.create();
 
@@ -514,6 +580,7 @@ public class GamePanel extends JPanel {
                 fg.dispose();
             }
         }
+
         g2d.translate(-shakeX, -shakeY);
         if (slideActive && slideAnim != null) {
             jumpscare(g, slideAnim);
@@ -606,5 +673,26 @@ public class GamePanel extends JPanel {
         slideStart = System.currentTimeMillis();
     }
 
+    public void startPowerOutAnimation() {
+        powerOutAnim = true;
+        darkness = 0f;
+
+        new Timer(50, e -> {
+            darkness += 0.05f;
+            if (darkness >= 0.8f) {
+                darkness = 0.8f;
+                ((Timer)e.getSource()).stop();
+            }
+            repaint();
+        }).start();
+    }
+
+
+    private boolean freddyEyesActive = false;
+
+    public void enableFreddyEyes(boolean enable) {
+        freddyEyesActive = enable;
+        repaint();
+    }
 
 }
