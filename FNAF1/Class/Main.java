@@ -27,6 +27,7 @@ public class Main {
     private static volatile boolean right_door_close = false;
     private static volatile boolean running = true;
     private static volatile int position = 0; // 0 gauche, 1 droite
+    private static volatile boolean can_play = true;
 
     private static L_animatronics L_a;
     private static Rooms_Graph rg;
@@ -70,7 +71,7 @@ public class Main {
         long last = cooldowns.getOrDefault(action, 0L);
         if (now - last >= cooldownMs) {
             cooldowns.put(action, now);
-            return true;
+            return can_play;
         }
         return false;
     }
@@ -93,6 +94,7 @@ public class Main {
         position = 0;
         power_usage = 1;
         power = 1000 * 60;
+        can_play=true;
         SoundManager.loop("Eerie ambience largesca");
         L_a = new L_animatronics();
         if (num == 1) L_a.L_animatronics_Builder_n1();
@@ -126,6 +128,9 @@ public class Main {
                     if (cam) remove_cam();
                     else {
                         put_cam();
+                        if(light_left||light_right){
+                            power_usage--;
+                        }
                         remove_light(0);
                         remove_light(1);
                     }
@@ -158,7 +163,7 @@ public class Main {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
                 if (SwingUtilities.isLeftMouseButton(e) && !cam) {
-                    if (canUse("LIGHT", 150)) put_light();
+                    if (canUse("LIGHT", 150)) {put_light(); power_usage++;}
                 }
                 else if (SwingUtilities.isRightMouseButton(e) && !cam) {
                     if (canUse("DOOR", 200)) door(rg);
@@ -166,8 +171,8 @@ public class Main {
             }
             @Override
             public void mouseReleased(java.awt.event.MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) {
-                    remove_light(position);
+                if (SwingUtilities.isLeftMouseButton(e)&&(light_left||light_right)) {
+                    remove_light(position); power_usage--;
                 }
             }
         });
@@ -218,7 +223,7 @@ public class Main {
         cam = true;
     }
 
-    private static void remove_cam() {
+    public static void remove_cam() {
         power_usage--;
         cam = false;
     }
@@ -382,6 +387,7 @@ public class Main {
     public static void gameOver() {
         running = false;
         SoundManager.stopAll();
+        SoundManager.play("bite_of_87_fnaf");
         if (gameFrame != null) {
             gameFrame.dispose();
             gameFrame = null;
@@ -443,72 +449,83 @@ public class Main {
 
     public static void nightWin() {
 
-    if (!running) return;
-    running = false;
-    if (currentNight < 6) {
-        currentNight++;
-        SaveManager.saveNight(currentNight);
-    }
-
-    SoundManager.stopAll();
-    SoundManager.play("fnaf-chimes");
-
-    if (gameFrame != null) {
-        gameFrame.dispose();
-        gameFrame = null;
-    }
-
-    if (winFrame != null) return;
-
-    winFrame = new JFrame("6 AM");
-    winFrame.setSize(800, 500);
-    winFrame.setUndecorated(true);
-    winFrame.setResizable(false);
-    winFrame.setLocationRelativeTo(null);
-    winFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
-    JPanel panel = new JPanel();
-    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-    panel.setBackground(Color.BLACK);
-
-    JLabel title = new JLabel("6 AM");
-    title.setForeground(Color.WHITE);
-    title.setFont(new Font("Arial", Font.BOLD, 72));
-    title.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-
-    JLabel win = new JLabel("VOUS AVEZ SURVÉCU");
-    win.setForeground(Color.GREEN);
-    win.setFont(new Font("Arial", Font.PLAIN, 22));
-    win.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-
-    JLabel hint = new JLabel("Appuyez sur ENTRÉE pour retourner au menu");
-    hint.setForeground(Color.GRAY);
-    hint.setFont(new Font("Arial", Font.PLAIN, 14));
-    hint.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-
-    panel.add(Box.createVerticalGlue());
-    panel.add(title);
-    panel.add(Box.createVerticalStrut(20));
-    panel.add(win);
-    panel.add(Box.createVerticalStrut(30));
-    panel.add(hint);
-    panel.add(Box.createVerticalGlue());
-
-    winFrame.add(panel);
-    winFrame.setVisible(true);
-
-    winFrame.addKeyListener(new KeyAdapter() {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                winFrame.dispose();
-                winFrame = null;
-                SoundManager.stopAll();
-                initialise_menu();
-            }
+        if (!running) return;
+        running = false;
+        if (currentNight < 6) {
+            currentNight++;
+            SaveManager.saveNight(currentNight);
         }
-    });
+
+        SoundManager.stopAll();
+        SoundManager.play("fnaf-chimes");
+
+        if (gameFrame != null) {
+            gameFrame.dispose();
+            gameFrame = null;
+        }
+
+        if (winFrame != null) return;
+
+        winFrame = new JFrame("6 AM");
+        winFrame.setSize(800, 500);
+        winFrame.setUndecorated(true);
+        winFrame.setResizable(false);
+        winFrame.setLocationRelativeTo(null);
+        winFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(Color.BLACK);
+
+        JLabel title = new JLabel("6 AM");
+        title.setForeground(Color.WHITE);
+        title.setFont(new Font("Arial", Font.BOLD, 72));
+        title.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+
+        JLabel win = new JLabel("VOUS AVEZ SURVÉCU");
+        win.setForeground(Color.GREEN);
+        win.setFont(new Font("Arial", Font.PLAIN, 22));
+        win.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+
+        JLabel hint = new JLabel("Appuyez sur ENTRÉE pour retourner au menu");
+        hint.setForeground(Color.GRAY);
+        hint.setFont(new Font("Arial", Font.PLAIN, 14));
+        hint.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+
+        panel.add(Box.createVerticalGlue());
+        panel.add(title);
+        panel.add(Box.createVerticalStrut(20));
+        panel.add(win);
+        panel.add(Box.createVerticalStrut(30));
+        panel.add(hint);
+        panel.add(Box.createVerticalGlue());
+
+        winFrame.add(panel);
+        winFrame.setVisible(true);
+
+        winFrame.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    winFrame.dispose();
+                    winFrame = null;
+                    SoundManager.stopAll();
+                    initialise_menu();
+                }
+            }
+        });
+    }
+
+    public static void cant_play(){
+        can_play=false;
+    }
+    public static GamePanel getGamePanel() {
+        return panel;
+    }
+    public static void startJumpscare(abstrac_animatronic a) {
+        running = false;
+        panel.startSlideJumpscare(a);
+    }
+
 }
 
-
-}

@@ -1,7 +1,9 @@
 package Class.animatronics;
 
+import java.awt.Graphics;
 import java.util.Random;
 
+import Class.GamePanel;
 import Class.Main;
 import Class.SoundManager;
 import Class.rooms.Rooms_Graph;
@@ -11,6 +13,7 @@ public abstract class abstrac_animatronic {
     private String id_room;
     private int difficultie;
     private int etape_mvt;
+    private int coter;      //0 gauche et 1 droite
 
     public abstrac_animatronic(String id_room,int difficultie,int etape_mvt){
         this.id_room =id_room;
@@ -35,6 +38,7 @@ public abstract class abstrac_animatronic {
     }
 
     public void move(Rooms_Graph rg){
+        this.update_coter();
         Random rand = new Random();
         int n = rand.nextInt(20) + 1;
         String id_room = this.get_id_room();
@@ -66,8 +70,7 @@ public abstract class abstrac_animatronic {
 
     public void kill(){
         if (this.get_id_room().equals("You")){
-            System.out.println("YOU ARE DEAD");
-            Main.gameOver();
+            Main.startJumpscare(this);
         }
     }
 
@@ -76,4 +79,21 @@ public abstract class abstrac_animatronic {
             SoundManager.play("Deep_Steps");    
         }
     }
+
+    public void set_coter(int c){
+        this.coter=c;
+    }
+    public int get_coter(){
+        return this.coter;
+    }
+
+    public void update_coter(){
+        if (this.id_room.equals("Door_Left")){
+            this.set_coter(0);
+        }else if(this.id_room.equals("Door_Right")){
+            this.set_coter(1);
+        }
+    }
+
 }
+

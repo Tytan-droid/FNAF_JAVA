@@ -4,7 +4,7 @@ import java.io.*;
 
 public class SaveManager {
 
-    private static final String SAVE_FILE = "save.dat";
+    private static final String SAVE_FILE = "FNAF1/save.dat";
 
     public static int loadNight() {
         File file = new File(SAVE_FILE);

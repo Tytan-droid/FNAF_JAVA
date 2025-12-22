@@ -10,12 +10,15 @@ public class Foxy extends abstrac_animatronic {
     public Foxy(String id_room,int difficultie,int etape_mvt){
         super(id_room, difficultie, etape_mvt);
     }
+    
     @Override
     public void mvt_sound(){
         SoundManager.play("fnaf-running");
     }
+
     @Override
     public void move(Rooms_Graph rg){
+        this.update_coter();
         Random rand = new Random();
         int n = rand.nextInt(20) + 1;
         String id_room = this.get_id_room();

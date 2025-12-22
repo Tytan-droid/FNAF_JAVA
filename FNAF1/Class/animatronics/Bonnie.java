@@ -12,6 +12,7 @@ public class Bonnie extends abstrac_animatronic {
     }
     @Override
     public void move(Rooms_Graph rg){
+        this.update_coter();
         Random rand = new Random();
         int n = rand.nextInt(20) + 1;
         String id_room=this.get_id_room();

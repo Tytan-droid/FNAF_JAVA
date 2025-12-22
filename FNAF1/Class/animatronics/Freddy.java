@@ -12,19 +12,21 @@ public class Freddy extends abstrac_animatronic {
     public  Freddy(String id_room,int difficultie,int etape_mvt){
         super(id_room,difficultie,etape_mvt);
     }
+
     @Override
     public void kill(){
         if ((this.get_id_room().equals("Door_Left"))||this.get_id_room().equals("Door_Right")) {
-            System.out.println("YOU ARE DEAD");
-            Main.gameOver();
         }
     }
+
     @Override
     public void mvt_sound(){
         SoundManager.play("fnaf-freddys-laugh");
     }
+
     @Override
     public void move(Rooms_Graph rg){
+        this.update_coter();
         Random rand = new Random();
         int n = rand.nextInt(20) + 1;
         String id_room = this.get_id_room();
@@ -56,6 +58,15 @@ public class Freddy extends abstrac_animatronic {
         }
         if(Main.isCam() && Main.getCurrentCamera().equals(this.get_id_room())){
             this.set_etape_mvt(0);
+        }
+    }
+
+    @Override
+    public void update_coter(){
+        if (this.get_id_room().equals("CAM2A")){
+            this.set_coter(0);
+        }else if(this.get_id_room().equals("CAM4A")){
+            this.set_coter(1);
         }
     }
 

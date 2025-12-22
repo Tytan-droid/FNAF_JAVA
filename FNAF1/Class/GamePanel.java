@@ -27,6 +27,11 @@ public class GamePanel extends JPanel {
     private volatile boolean blackoutActive = false;
     private volatile long blackoutStart = 0L;
     private volatile long blackoutDuration = 0L;
+    private boolean slideActive = false;
+    private long slideStart = 0;
+    private static final int SLIDE_DURATION = 600;
+    private abstrac_animatronic slideAnim = null;
+    private boolean gameOverTriggered = false;
 
     public void startCameraBlackout(int ms) {
         blackoutDuration = Math.max(0, ms);
@@ -44,7 +49,7 @@ public class GamePanel extends JPanel {
         repaint();
     }
 
-    private void drawAnimAtGuard(Graphics g, abstrac_animatronic a, int x, int y, int targetW, int targetH, boolean leftSide) {
+    public void drawAnimAtGuard(Graphics g, abstrac_animatronic a, int x, int y, int targetW, int targetH, boolean leftSide) {
         if (a == null) return;
         String baseName;
         if (a instanceof Chica) baseName = "Chica";
@@ -125,7 +130,7 @@ public class GamePanel extends JPanel {
             }
         } catch (IOException | IllegalArgumentException ignored) {
         }
-
+        
         try {
             java.io.File f = new java.io.File("FNAF1/Pictures/room_You.png");
             if (f.exists()) {
@@ -173,7 +178,8 @@ public class GamePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
+        L_animatronics la = Main.getAnimatronics();
+        java.util.List<abstrac_animatronic> list = la.get_L();
         if (image != null) {
             g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
         }
@@ -192,11 +198,8 @@ public class GamePanel extends JPanel {
                     y = (getHeight() - targetH) / 2;
                 }
                 g.drawImage(guard, x, y, targetW, targetH, this);
-
                 try {
-                    L_animatronics la = Main.getAnimatronics();
                     if (la != null) {
-                        java.util.List<abstrac_animatronic> list = la.get_L();
                         if (Main.isLightLeft()) {
                             for (abstrac_animatronic a : list) {
                                 if (a == null) continue;
@@ -218,8 +221,7 @@ public class GamePanel extends JPanel {
                     }
                 } catch (Throwable ignored) {}
             }
-        } catch (Throwable ignored) {
-        }
+        } catch (Throwable ignored) {}
         
         try {
             if (Main.isCam()) {
@@ -273,9 +275,7 @@ public class GamePanel extends JPanel {
 
                     try {
                         if (!"CAM6".equals(camId)) {
-                            L_animatronics la = Main.getAnimatronics();
                             if (la != null) {
-                                java.util.List<abstrac_animatronic> list = la.get_L();
 
                                 try {
                                     String currentCam = camId;
@@ -327,7 +327,6 @@ public class GamePanel extends JPanel {
                                             y = (int) (h * 0.65) - markerSize / 2;
                                         }
 
-                                        boolean drawn = false;
                                         if (baseName != null) {
                                             String side = Main.getPosition() == 0 ? "_Left" : "_Right";
                                             String key = baseName + side;
@@ -354,7 +353,6 @@ public class GamePanel extends JPanel {
                                                 int dx = x - (drawW - markerSize) / 2;
                                                 int dy = y - (drawH - markerSize) / 2;
                                                 g.drawImage(animImg, dx, dy, drawW, drawH, this);
-                                                drawn = true;
                                             }
                                         }
                                     }
@@ -366,7 +364,6 @@ public class GamePanel extends JPanel {
                 }
             }
         } catch (Throwable ignored) {}
-
         try {
             boolean leftClose = Main.left_door_close();
             boolean rightClose = Main.right_door_close();
@@ -487,6 +484,62 @@ public class GamePanel extends JPanel {
             g2.drawString(hourText, x, y);
             g2.dispose();
         } catch (Throwable ignored) {}
-
+        if (slideActive && slideAnim != null) {
+            jumpscare(g, slideAnim);
+            repaint();
+            return;
+        }
     }
+
+    public void jumpscare(Graphics g, abstrac_animatronic a) {
+        if (!slideActive || a == null) return;
+        Main.remove_cam();
+        Main.cant_play();
+        long elapsed = System.currentTimeMillis() - slideStart;
+        float t = Math.min(1f, elapsed / (float) SLIDE_DURATION);
+
+        t = t * t;
+
+        int targetW = getWidth() / 10;
+        int targetH = targetW;
+
+        int finalX = (getWidth() - targetW) / 2;
+        int finalY = (getHeight() - targetH) / 2+20;
+
+        boolean fromLeft = a.get_coter() == 0;
+
+        int startX = fromLeft
+                ? finalX - targetW / 4 - 200 
+                : finalX + targetW / 4 + 300;
+
+        int x = (int) (startX + (finalX - startX) * t);
+
+        drawAnimAtGuard(
+            g,
+            a,
+            x,
+            finalY,
+            (int)(targetW * 1.5),
+            (int)(targetH * 1.5),
+            fromLeft
+        );
+
+        if (t >= 1f) {
+            slideActive = false;
+            new javax.swing.Timer(300, e -> {
+                ((javax.swing.Timer)e.getSource()).stop();
+                Main.gameOver();
+            }).start();
+        }
+    }
+
+
+
+    public void startSlideJumpscare(abstrac_animatronic a) {
+        slideAnim = a;
+        slideActive = true;
+        slideStart = System.currentTimeMillis();
+    }
+
+
 }
