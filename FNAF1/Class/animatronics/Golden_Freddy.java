@@ -18,7 +18,7 @@ public class Golden_Freddy extends abstrac_animatronic{
 
     public void spawn(){
         Random rand = new Random();
-        int n = rand.nextInt(30) + 1;
+        int n = rand.nextInt(100) + 1;
         if(n<=this.get_difficultie()){
             this.is_here=true;
         }
