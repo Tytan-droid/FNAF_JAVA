@@ -16,6 +16,8 @@ public class Freddy extends abstrac_animatronic {
     @Override
     public void kill(){
         if ((this.get_id_room().equals("Door_Left"))||this.get_id_room().equals("Door_Right")) {
+            this.set_id_room("You");
+            Main.startJumpscare(this);
         }
     }
 
@@ -26,6 +28,9 @@ public class Freddy extends abstrac_animatronic {
 
     @Override
     public void move(Rooms_Graph rg){
+        if(this.get_id_room().equals("You")){
+            return;
+        }
         this.update_coter();
         Random rand = new Random();
         int n = rand.nextInt(20) + 1;

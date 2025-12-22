@@ -31,7 +31,16 @@ public class GamePanel extends JPanel {
     private long slideStart = 0;
     private static final int SLIDE_DURATION = 600;
     private abstrac_animatronic slideAnim = null;
-    private boolean gameOverTriggered = false;
+
+    private boolean flashActive = false;
+    private long flashStart = 0;
+    private static final int FLASH_DURATION = 120;
+
+    private boolean shakeActive = false;
+    private long shakeStart = 0;
+    private static final int SHAKE_DURATION = 300;
+    private static final int SHAKE_INTENSITY = 18;
+
 
     public void startCameraBlackout(int ms) {
         blackoutDuration = Math.max(0, ms);
@@ -178,6 +187,20 @@ public class GamePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        int shakeX = 0;
+        int shakeY = 0;
+
+        if (shakeActive) {
+            long elapsed = System.currentTimeMillis() - shakeStart;
+            if (elapsed < SHAKE_DURATION) {
+                shakeX = (int) (Math.random() * SHAKE_INTENSITY - SHAKE_INTENSITY / 2);
+                shakeY = (int) (Math.random() * SHAKE_INTENSITY - SHAKE_INTENSITY / 2);
+            } else {
+                shakeActive = false;
+            }
+        }
+        g2d.translate(shakeX, shakeY);
         L_animatronics la = Main.getAnimatronics();
         java.util.List<abstrac_animatronic> list = la.get_L();
         if (image != null) {
@@ -484,6 +507,21 @@ public class GamePanel extends JPanel {
             g2.drawString(hourText, x, y);
             g2.dispose();
         } catch (Throwable ignored) {}
+        if (flashActive) {
+            long elapsed = System.currentTimeMillis() - flashStart;
+            float alpha = 1f - Math.min(1f, elapsed / (float) FLASH_DURATION);
+
+            if (alpha <= 0f) {
+                flashActive = false;
+            } else {
+                Graphics2D fg = (Graphics2D) g.create();
+                fg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+                fg.setColor(Color.WHITE);
+                fg.fillRect(0, 0, getWidth(), getHeight());
+                fg.dispose();
+            }
+        }
+        g2d.translate(-shakeX, -shakeY);
         if (slideActive && slideAnim != null) {
             jumpscare(g, slideAnim);
             repaint();
@@ -526,6 +564,11 @@ public class GamePanel extends JPanel {
 
         if (t >= 1f) {
             slideActive = false;
+                flashActive = true;
+                flashStart = System.currentTimeMillis();
+
+                shakeActive = true;
+                shakeStart = System.currentTimeMillis();
             new javax.swing.Timer(300, e -> {
                 ((javax.swing.Timer)e.getSource()).stop();
                 Main.gameOver();
