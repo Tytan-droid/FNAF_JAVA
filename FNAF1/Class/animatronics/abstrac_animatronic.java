@@ -37,6 +37,14 @@ public abstract class abstrac_animatronic {
         this.id_room=id_room;
     }
 
+    public void set_is_here(){
+
+    }
+
+    public int get_etape(){
+        return 0;
+    }
+
     public void move(Rooms_Graph rg){
         this.update_coter();
         Random rand = new Random();
@@ -97,6 +105,11 @@ public abstract class abstrac_animatronic {
 
     public boolean get_is_here(){
         return true;
+    }
+
+    public void rewind(){
+    }
+    public void end_rewind(){
     }
 }
 

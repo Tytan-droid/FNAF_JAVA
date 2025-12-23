@@ -14,6 +14,7 @@ import Class.animatronics.Freddy;
 import Class.animatronics.Freddy_Eyes;
 import Class.animatronics.Foxy;
 import Class.animatronics.Golden_Freddy;
+import Class.animatronics.Puppet;
 import Class.animatronics.L_animatronics;
 
 public class GamePanel extends JPanel {
@@ -52,9 +53,6 @@ public class GamePanel extends JPanel {
     private boolean eyesVisible = true;
     private long lastBlink = System.currentTimeMillis();
 
-
-
-
     public void startCameraBlackout(int ms) {
         blackoutDuration = Math.max(0, ms);
         blackoutStart = System.currentTimeMillis();
@@ -80,6 +78,7 @@ public class GamePanel extends JPanel {
         else if (a instanceof Foxy) baseName = "Foxy";
         else if (a instanceof Golden_Freddy) baseName = "Golden_Freddy";
         else if (a instanceof Freddy_Eyes) baseName = "Freddy_Eyes";
+        else if(a instanceof Puppet) baseName = "Puppet";
         else baseName = null;
 
         Graphics2D g2 = (Graphics2D) g.create();
@@ -139,16 +138,7 @@ public class GamePanel extends JPanel {
         return null;
     }
 
-    public GamePanel() {
-        try {
-            java.net.URL url = getClass().getResource("/images/background.png");
-            if (url != null) {
-                image = ImageIO.read(url);
-                return;
-            }
-        } catch (IOException | IllegalArgumentException ignored) {
-        }
-        
+    public GamePanel() {        
         try {
             java.io.File f = new java.io.File("FNAF1/Pictures/room_You.png");
             if (f.exists()) {
@@ -324,7 +314,7 @@ public class GamePanel extends JPanel {
                                 java.util.List<abstrac_animatronic> present = new java.util.ArrayList<>();
                                 for (abstrac_animatronic a : list) {
                                     if (a != null && camId.equals(a.get_id_room())) {
-                                        if (a instanceof Chica || a instanceof Bonnie || a instanceof Freddy || a instanceof Foxy|| a instanceof Golden_Freddy|| a instanceof Freddy_Eyes) {
+                                        if (a instanceof Chica || a instanceof Bonnie || a instanceof Freddy || a instanceof Foxy|| a instanceof Golden_Freddy|| a instanceof Freddy_Eyes ||a instanceof Puppet) {
                                             present.add(a);
                                         }
                                     }
@@ -340,6 +330,7 @@ public class GamePanel extends JPanel {
                                         else if (a instanceof Foxy) baseName = "Foxy";
                                         else if (a instanceof Golden_Freddy) baseName = "Golden_Freddy";
                                         else if (a instanceof Freddy_Eyes) baseName = "Freddy_Eyes";
+                                        else if(a instanceof Puppet)baseName = "Puppet";
                                         else baseName = null;
 
                                         int w = getWidth();
@@ -362,7 +353,7 @@ public class GamePanel extends JPanel {
                                         }
 
                                         if (baseName != null) {
-                                            String side = Main.getPosition() == 0 ? "_Left" : "_Right";
+                                            String side ="_Left" ;
                                             String key = baseName + side;
                                             Image animImg = animImages.get(key);
                                             if (animImg == null) {
@@ -578,6 +569,7 @@ public class GamePanel extends JPanel {
                 fg.setColor(Color.WHITE);
                 fg.fillRect(0, 0, getWidth(), getHeight());
                 fg.dispose();
+                return;
             }
         }
 
@@ -585,7 +577,6 @@ public class GamePanel extends JPanel {
         if (slideActive && slideAnim != null) {
             jumpscare(g, slideAnim);
             repaint();
-            return;
         }
         for (abstrac_animatronic a : list) {
             if (a instanceof Golden_Freddy && !Main.isCam()&& a.get_is_here()) {
@@ -606,6 +597,26 @@ public class GamePanel extends JPanel {
                     int dx = 300;
                     int dy = getHeight()-160;
                     drawAnimAtGuard(g, a, dx, dy, (int)(targetW * 1.5), (int)(targetH * 1.5), true);
+                }
+            }else if (a instanceof Puppet && !Main.isCam()&& a.get_is_here()) {
+                String side ="_Left";
+                String key = "Puppet" + side;
+                Image animImg = animImages.get(key);
+                if (animImg == null) {
+                    try {
+                        java.io.File f = new java.io.File("FNAF1/Pictures/" + key + ".png");
+                        if (f.exists()) animImg = ImageIO.read(f);
+                    } catch (IOException ignored) {}
+                    if (animImg != null) animImages.put(key, animImg);
+                }
+
+                if (animImg != null) {
+                    int targetW = getWidth() / 10;
+                    int targetH = targetW;
+                    int dx = 500;
+                    int dy = getHeight()-160;
+                    drawAnimAtGuard(g, a, dx, dy, (int)(targetW * 1.5), (int)(targetH * 1.5), false);
+                    drawGift(g,a,430,getHeight()-280,(int)(getWidth()/4.5),(int)(getWidth()/4.5));
                 }
             }
         }
@@ -636,6 +647,9 @@ public class GamePanel extends JPanel {
         if(a instanceof Golden_Freddy){
             startX=300;
             startY=getHeight()-160;
+        }else if(a instanceof Puppet){
+            startX=500;
+            startY=getHeight()-160;
         }
 
         int x = (int) (startX + (finalX - startX) * t);
@@ -650,6 +664,9 @@ public class GamePanel extends JPanel {
             (int)(targetH * 1.5),
             fromLeft
         );
+        if(a instanceof Puppet){
+            drawGift(g,a,430,getHeight()-280,(int)(getWidth()/4.5),(int)(getWidth()/4.5));
+        }
 
         if (t >= 1f) {
             slideActive = false;
@@ -705,6 +722,11 @@ public class GamePanel extends JPanel {
         } catch (Exception ignored) {}
 
         return null;
+    }
+
+    private void drawGift(Graphics g, abstrac_animatronic a, int dx, int dy, int w, int h){
+        Image Gift = loadImage("Gift_"+a.get_etape()+".png");
+        g.drawImage(Gift,dx, dy, w, h,this);
     }
 
 }

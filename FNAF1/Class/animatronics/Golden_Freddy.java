@@ -57,4 +57,8 @@ public class Golden_Freddy extends abstrac_animatronic{
     @Override
     public void kill(){
     }
+    @Override
+    public void set_is_here(){
+        this.is_here=false;
+    }
 }

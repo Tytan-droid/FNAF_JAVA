@@ -43,6 +43,7 @@ public class Main {
     private static volatile boolean running = true;
     private static volatile int position = 0; // 0 gauche, 1 droite
     private static volatile boolean can_play = true;
+    private static boolean rewindKeyDown = false;
 
     private static L_animatronics L_a;
     private static Rooms_Graph rg;
@@ -194,6 +195,22 @@ public class Main {
                         }
                     }
                 }
+                if (e.getKeyCode() == KeyEvent.VK_Z || e.getKeyCode() == KeyEvent.VK_UP) {
+                    if (!rewindKeyDown && !cam) {
+                        rewindKeyDown = true;
+                        getAnimatronics().get_puppet().rewind();
+                    }
+                    return;
+                }
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if ((e.getKeyCode() == KeyEvent.VK_Z || e.getKeyCode() == KeyEvent.VK_UP)
+                    && rewindKeyDown) {
+
+                    rewindKeyDown = false;
+                    getAnimatronics().get_puppet().end_rewind();
+                }
             }
         });
         gameFrame.addMouseListener(new MouseAdapter() {
@@ -213,6 +230,9 @@ public class Main {
                 }
             }
         });
+        gameFrame.setFocusable(true);
+        gameFrame.requestFocusInWindow();
+
         new Thread(Main::run).start();
     }
 
@@ -230,6 +250,13 @@ public class Main {
     }
 
     private static void update() {
+        if(cam){
+            getAnimatronics().get_puppet().end_rewind();
+            rewindKeyDown=false;
+        }
+        if (rewindKeyDown && !cam) {
+            getAnimatronics().get_puppet().rewind();
+        }
 
         if (getHour() >= 6) {
             nightWin();
@@ -1006,6 +1033,22 @@ public class Main {
                         }
                     }
                 }
+                if (e.getKeyCode() == KeyEvent.VK_Z || e.getKeyCode() == KeyEvent.VK_UP) {
+                    if (!rewindKeyDown && !cam) {
+                        rewindKeyDown = true;
+                        getAnimatronics().get_puppet().rewind();
+                    }
+                    return;
+                }
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if ((e.getKeyCode() == KeyEvent.VK_Z || e.getKeyCode() == KeyEvent.VK_UP)
+                    && rewindKeyDown) {
+
+                    rewindKeyDown = false;
+                    getAnimatronics().get_puppet().end_rewind();
+                }
             }
         });
         gameFrame.addMouseListener(new MouseAdapter() {
@@ -1026,6 +1069,8 @@ public class Main {
             }
         });
         new Thread(Main::run).start();
+        gameFrame.setFocusable(true);
+        gameFrame.requestFocusInWindow();
     }
 
     private static Timer randomSoundTimer;

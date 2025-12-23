@@ -15,8 +15,8 @@ public class CustomNightMenu extends JPanel {
     static boolean presetLocked = false;
     static boolean all20Lock = lastPreset.equals("ALL 20");
 
-    static int[] difficulty = {0, 0, 0, 0, 0};
-    static String[] names = {"Freddy", "Bonnie", "Chica", "Foxy", "Golden"};
+    static int[] difficulty = {0, 0, 0, 0, 0,0};
+    static String[] names = {"Freddy", "Bonnie", "Chica", "Foxy", "Golden Freddy","Puppet"};
     static int selected = 0;
 
     public CustomNightMenu() {
@@ -202,6 +202,7 @@ public class CustomNightMenu extends JPanel {
                 difficulty[2] = 15;
                 difficulty[3] = 18;
                 difficulty[4] = 10;
+                difficulty[5]=18;
                 all20Lock = false;
             }
             case PRESET_RANDOM -> {
