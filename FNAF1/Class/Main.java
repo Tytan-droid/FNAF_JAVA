@@ -653,7 +653,7 @@ public class Main {
     public static void returnToMenu() {
 
         running = false;
-
+        stopRandomSounds();
         SoundManager.stopAll();
         SoundManager.loop("fnaf-music-box-109");
 
@@ -761,7 +761,7 @@ public class Main {
             currentNight++;
             SaveManager.saveNight(currentNight);
         }
-
+        stopRandomSounds();
         SoundManager.stopAll();
         SoundManager.play("fnaf-chimes");
 
@@ -830,6 +830,7 @@ public class Main {
     }
     public static void startJumpscare(abstrac_animatronic a) {
         running = false;
+        stopRandomSounds();
         panel.startSlideJumpscare(a);
     }
 
@@ -974,6 +975,14 @@ public class Main {
         });
         randomSoundTimer.start();
     }
+
+    public static void stopRandomSounds() {
+        if (randomSoundTimer != null) {
+            randomSoundTimer.stop();
+            randomSoundTimer = null;
+        }
+    }
+
 
 }
 
