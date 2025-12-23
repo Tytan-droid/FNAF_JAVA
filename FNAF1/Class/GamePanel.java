@@ -144,9 +144,7 @@ public class GamePanel extends JPanel {
             if (f.exists()) {
                 image = ImageIO.read(f);
             }
-        } catch (IOException e) {
-            System.out.println("Failed to load background image: " + e.getMessage());
-        }
+        } catch (IOException e) {}
 
         try {
             java.net.URL urlL = getClass().getResource("/images/Guard_Left.png");
@@ -306,7 +304,11 @@ public class GamePanel extends JPanel {
                                         String prev = lastSeenRooms.get(a);
                                         String nowRoom = a.get_id_room();
                                         if (prev != null && prev.equals(currentCam) && !currentCam.equals(nowRoom) && Main.isCam()) {
-                                            try { Main.blinkCamera(400); } catch (Throwable ignored) {}
+                                            try { 
+                                                Main.blinkCamera(400); 
+                                                GamePanel.camNoiseStrength = 0.7f;
+                                                GamePanel.camSwitching = true;    
+                                            } catch (Throwable ignored) {}
                                         }
                                         lastSeenRooms.put(a, nowRoom);
                                     }
@@ -376,6 +378,18 @@ public class GamePanel extends JPanel {
                                         }
                                     }
                                 }
+                            }
+                        }
+                        if (Main.isCam()) {
+                            drawStatic(g);
+                            applyOldCameraFilter(g);
+                            drawCameraSnow(g);
+                        }
+                        if (Main.staticActive) {
+                            drawStatic(g);
+
+                            if (System.currentTimeMillis() - Main.staticStartTime > Main.STATIC_DURATION) {
+                                Main.staticActive = false;
                             }
                         }
                     } catch (Throwable ignored) {}
@@ -682,8 +696,6 @@ public class GamePanel extends JPanel {
         }
     }
 
-
-
     public void startSlideJumpscare(abstrac_animatronic a) {
         slideAnim = a;
         slideActive = true;
@@ -728,5 +740,153 @@ public class GamePanel extends JPanel {
         Image Gift = loadImage("Gift_"+a.get_etape()+".png");
         g.drawImage(Gift,dx, dy, w, h,this);
     }
+  
+    public class CameraMap {
+    
+        public static Map<String, Rectangle> cameras = new HashMap<>();
+    
+        static {
+            cameras.put("CAM1A", new Rectangle(587, 286, 42, 28));
+            cameras.put("CAM1B", new Rectangle(574, 318, 42, 28));
+            cameras.put("CAM1C", new Rectangle(554, 362, 42, 28));
+            cameras.put("CAM2A", new Rectangle(588, 432, 42, 28));
+            cameras.put("CAM2B", new Rectangle(587, 453, 42, 28));
+            cameras.put("CAM3",  new Rectangle(533, 419, 42, 28));
+            cameras.put("CAM4A",  new Rectangle(656, 431, 42, 28));
+            cameras.put("CAM4B",  new Rectangle(655, 455, 42, 28));
+            cameras.put("CAM5",  new Rectangle(506, 333, 42, 28));
+            cameras.put("CAM6",  new Rectangle(718, 410, 42, 28));
+            cameras.put("CAM7",  new Rectangle(725, 333, 42, 28));
+        }
+
+    }
+
+    private void drawStatic(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+
+        int w = getWidth();
+        int h = getHeight();
+
+        float alpha = 0.2f + (float)Math.random() * 0.4f;
+        g2.setComposite(AlphaComposite.getInstance(
+            AlphaComposite.SRC_OVER, alpha
+        ));
+
+        for (int i = 0; i < 2500; i++) {
+            int x = (int)(Math.random() * w);
+            int y = (int)(Math.random() * h);
+            int gray = (int)(Math.random() * 255);
+
+            g2.setColor(new Color(gray, gray, gray));
+            g2.fillRect(x, y, 1, 1);
+        }
+        g2.setColor(new Color(255, 255, 255, 40));
+        int y = (int)(Math.random() * h);
+        g2.fillRect(0, y, w, 2);
+        g2.dispose();
+
+
+    }
+
+    private float camFlicker = 1f;
+    private long lastFlickerTime = 0;
+
+    public void applyOldCameraFilter(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        int w = getWidth();
+        int h = getHeight();
+
+        if (System.currentTimeMillis() - lastFlickerTime > 80) {
+            camFlicker = 0.85f + (float)Math.random() * 0.25f;
+            lastFlickerTime = System.currentTimeMillis();
+        }
+
+        g2.setComposite(AlphaComposite.getInstance(
+            AlphaComposite.SRC_OVER, camFlicker
+        ));
+
+        g2.setColor(new Color(120, 120, 120, 40));
+        g2.fillRect(0, 0, w, h);
+
+        g2.setComposite(AlphaComposite.getInstance(
+            AlphaComposite.SRC_OVER, 0.15f
+        ));
+        g2.setColor(Color.BLACK);
+
+        for (int y = 0; y < h; y += 3) {
+            g2.drawLine(0, y, w, y);
+        }
+
+        g2.setComposite(AlphaComposite.getInstance(
+            AlphaComposite.SRC_OVER, 0.25f
+        ));
+
+        for (int i = 0; i < 800; i++) {
+            int x = (int)(Math.random() * w);
+            int y = (int)(Math.random() * h);
+            int gray = 100 + (int)(Math.random() * 100);
+
+            g2.setColor(new Color(gray, gray, gray));
+            g2.fillRect(x, y, 1, 1);
+        }
+
+        g2.setComposite(AlphaComposite.getInstance(
+            AlphaComposite.SRC_OVER, 0.25f
+        ));
+        g2.setColor(Color.BLACK);
+        g2.drawRect(0, 0, w - 1, h - 1);
+
+        g2.dispose();
+    }
+
+    public static float camNoiseStrength = 0f;
+    public static boolean camSwitching = false;
+
+
+    private void drawCameraSnow(Graphics g) {
+        if (camNoiseStrength <= 0f) return;
+
+        Graphics2D g2 = (Graphics2D) g.create();
+        int w = getWidth();
+        int h = getHeight();
+
+        int slices = (int)(camNoiseStrength * 25);
+        for (int i = 0; i < slices; i++) {
+            int sliceY = (int)(Math.random() * h);
+            int sliceH = 5 + (int)(Math.random() * 25);
+            int offset = (int)((Math.random() - 0.5) * 80 * camNoiseStrength);
+
+            g2.copyArea(0, sliceY, w, sliceH, offset, 0);
+        }
+
+        int blocks = (int)(camNoiseStrength * 80);
+        for (int i = 0; i < blocks; i++) {
+            int bw = 10 + (int)(Math.random() * 80);
+            int bh = 5 + (int)(Math.random() * 30);
+            int x = (int)(Math.random() * w);
+            int y = (int)(Math.random() * h);
+
+            int gray = (int)(Math.random() * 255);
+            g2.setColor(new Color(gray, gray, gray, 180));
+            g2.fillRect(x, y, bw, bh);
+        }
+        if (Math.random() < 0.6) {
+            g2.setComposite(AlphaComposite.getInstance(
+                    AlphaComposite.SRC_OVER,
+                    camNoiseStrength * 0.7f
+            ));
+            g2.setColor(Color.WHITE);
+            g2.fillRect(0, 0, w, h);
+        }
+
+        g2.dispose();
+
+        camNoiseStrength -= 0.25f;
+        if (camNoiseStrength <= 0f) {
+            camNoiseStrength = 0f;
+            camSwitching = false;
+        }
+    }
+
 
 }

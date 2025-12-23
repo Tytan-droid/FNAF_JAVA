@@ -17,6 +17,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import Class.animatronics.*;
 import Class.rooms.*;
+import Class.GamePanel.CameraMap;
 import Class.SoundManager;
 
 public class Main {
@@ -68,6 +70,11 @@ public class Main {
     private static volatile int power_usage = 1;
     private static volatile int power = 1000 * 60;
 
+    public static boolean staticActive = false;
+    public static long staticStartTime;
+    public static final int STATIC_DURATION = 500;
+
+
     private enum PowerOutPhase {
         DARKEN,
         EYES,
@@ -84,14 +91,12 @@ public class Main {
             "CAM4A","CAM4B","CAM5","CAM6","CAM7"
     };
     static String[] hints = {
-        "ESC pendant la nuit : retour menu",
-        "Ferme les portes seulement si nécessaire",
-        "Surveille ta consommation d'énergie",
-        "Les caméras consomment de l'électricité",
-        "Tous les animatroniques ont un comportement différent",
-        "Écoute les bruits de pas...",
-        "Ne cligne pas trop longtemps des yeux",
-        "Ils te regardent déjà",
+        "ESC during the night: return to menu",
+        "Close the doors only if necessary",
+        "Don't forget th music box...",
+        "Listen to the footsteps...",
+        "Don't blink for too long",
+        "They are already watching you",
         "Mais où touvent-ils toute cette énergie ?",
         "Ur ur ur ur...",
         "Was that the bite of 67 ?",
@@ -221,6 +226,15 @@ public class Main {
                 }
                 else if (SwingUtilities.isRightMouseButton(e) && !cam) {
                     if (canUse("DOOR", 200)) door(rg);
+                }
+                if (cam){
+                    Point p = e.getPoint();
+                    for (Map.Entry<String, Rectangle> entry : CameraMap.cameras.entrySet()) {
+                        if (entry.getValue().contains(p)) {
+                            switchCamera(entry.getKey());
+                            break;
+                        }
+                    }
                 }
             }
             @Override
@@ -355,9 +369,6 @@ public class Main {
         }
     }
 
-
-
-
     private static void render() {
         if (panel != null) panel.repaint();
     }
@@ -373,10 +384,28 @@ public class Main {
         return CAMERA_IDS[0];
     }
 
+    public static void switchCamera(String cam_Id) {
+        if (Main.getCurrentCamera().equals(cam_Id)) return;
+        for(int id =0; id<CAMERA_IDS.length;id++){
+            if (CAMERA_IDS[id].equals(cam_Id)){
+                cam_id=id;
+            }
+        }
+        SoundManager.play("fnaf2-camera");
+        GamePanel.camNoiseStrength = 0.7f;
+        GamePanel.camSwitching = true;        
+        }
+
+    public static void triggerStatic() {
+        staticActive = true;
+        staticStartTime = System.currentTimeMillis();
+    }
+
     private static void put_cam() {
         SoundManager.play("fnaf-open-camera-sound");
         power_usage++;
         cam = true;
+        triggerStatic();
     }
 
     public static void remove_cam() {
@@ -401,12 +430,16 @@ public class Main {
     private static void switch_cam_left() {
         SoundManager.play("fnaf2-camera");
         cam_id = (cam_id > 0) ? cam_id - 1 : 10;
-    }
+        GamePanel.camNoiseStrength = 0.7f;
+        GamePanel.camSwitching = true;    
+        }
 
     private static void switch_cam_right() {
         SoundManager.play("fnaf2-camera");
         cam_id = (cam_id < 10) ? cam_id + 1 : 0;
-    }
+        GamePanel.camNoiseStrength = 0.7f;
+        GamePanel.camSwitching = true;    
+        }
 
     private static volatile long lastBlink = 0;
 
@@ -497,14 +530,14 @@ public class Main {
         hint.setFont(new Font("Arial", Font.PLAIN, 14));
         hint.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 
-        JLabel continueBtn = createMenuItem("CONTINUER", () -> startNight(nightNumber));
+        JLabel continueBtn = createMenuItem("CONTINUE", () -> startNight(nightNumber));
 
-        JLabel nightLabel = new JLabel("Nuit " + nightNumber);
+        JLabel nightLabel = new JLabel("Night " + nightNumber);
         nightLabel.setForeground(Color.GRAY);
         nightLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         nightLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 
-        JLabel restartBtn = createMenuItem("RECOMMENCER", () -> {
+        JLabel restartBtn = createMenuItem("NEW GAME", () -> {
             SaveManager.saveNight(1);
             startNight(1);
         });
@@ -554,9 +587,9 @@ public class Main {
 
             title.setText(glitchText("Five Nights at Freddy's"));
             hint.setText(glitchText(randomHint));
-            continueBtn.setText(glitchText("CONTINUER"));
-            nightLabel.setText(glitchText("Nuit " + nightNumber));
-            restartBtn.setText(glitchText("RECOMMENCER"));
+            continueBtn.setText(glitchText("CONTINUE"));
+            nightLabel.setText(glitchText("Night " + nightNumber));
+            restartBtn.setText(glitchText("NEW GAME"));
             customBtn.setText(glitchText("CUSTOM NIGHT"));
 
         }).start();
@@ -793,7 +826,7 @@ public class Main {
         title.setForeground(java.awt.Color.RED);
         title.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 60));
         title.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        JLabel info = new JLabel("Appuyez sur ENTRÉE pour retourner au menu");
+        JLabel info = new JLabel("PRESS ENTER to return to menu");
         info.setForeground(java.awt.Color.WHITE);
         info.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 18));
         info.setAlignmentX(JLabel.CENTER_ALIGNMENT);
@@ -880,12 +913,12 @@ public class Main {
         title.setFont(new Font("Arial", Font.BOLD, 72));
         title.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 
-        JLabel win = new JLabel("VOUS AVEZ SURVÉCU");
+        JLabel win = new JLabel("YOU WON !");
         win.setForeground(Color.GREEN);
         win.setFont(new Font("Arial", Font.PLAIN, 22));
         win.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 
-        JLabel hint = new JLabel("Appuyez sur ENTRÉE pour retourner au menu");
+        JLabel hint = new JLabel("PRESS ENTER to return to menu");
         hint.setForeground(Color.GRAY);
         hint.setFont(new Font("Arial", Font.PLAIN, 14));
         hint.setAlignmentX(JLabel.CENTER_ALIGNMENT);
@@ -1059,6 +1092,15 @@ public class Main {
                 }
                 else if (SwingUtilities.isRightMouseButton(e) && !cam) {
                     if (canUse("DOOR", 200)) door(rg);
+                }
+                if (cam){
+                    Point p = e.getPoint();
+                    for (Map.Entry<String, Rectangle> entry : CameraMap.cameras.entrySet()) {
+                        if (entry.getValue().contains(p)) {
+                            switchCamera(entry.getKey());
+                            break;
+                        }
+                    }
                 }
             }
             @Override

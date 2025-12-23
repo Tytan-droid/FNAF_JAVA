@@ -173,7 +173,7 @@ public class CustomNightMenu extends JPanel {
         g2.setFont(new Font("Arial", Font.PLAIN, 14));
         g2.setColor(Color.GRAY);
         g2.drawString(
-                "← → Modifier  ↑ ↓ Sélection  ENTER Démarrer  ESC Retour  [1]ALL 0  [2]ALL 20  [3]HARD  [4]RANDOM",
+                "← →: Modify  ↑ ↓: Select  ENTER: Begin  ESC: Return  \n [1]ALL 0  [2]ALL 20  [3]HARD  [4]RANDOM",
                 60, getHeight() - 40
             );
     }
