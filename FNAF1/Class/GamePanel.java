@@ -695,4 +695,16 @@ public class GamePanel extends JPanel {
         repaint();
     }
 
+    private static Image starImg;
+
+    public static Image loadStar() {
+        if (starImg != null) return starImg;
+        try {
+            File f = new File("FNAF1/Pictures/404-4043726_cartoon-gold-star-clip-arts-cartoon-gold-star.png");
+            if (f.exists()) return starImg = ImageIO.read(f);
+        } catch (Exception ignored) {}
+
+        return null;
+    }
+
 }

@@ -9,15 +9,18 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.AlphaComposite;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +60,6 @@ public class Main {
 
     private static boolean powerOut = false;
     private static long powerOutStart = 0;
-    private static boolean powerKillTriggered = false;
-
     private static long nightStartTime;
     private static final int SECONDS_PER_HOUR = 30;
     private static int currentNight = 1;
@@ -110,6 +111,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        SaveManager.load();
         SoundManager.loadAll("FNAF1/Sounds");
         currentNight = SaveManager.loadNight();
         initialise_menu();
@@ -129,7 +131,6 @@ public class Main {
         power = 1000 * 60;
         powerOut = false;
         powerOutStart = 0;
-        powerKillTriggered = false;        
         can_play=true;
         SoundManager.loop("Eerie ambience largesca");
         L_a = new L_animatronics();
@@ -485,6 +486,7 @@ public class Main {
             openCustomNight();
         });
 
+        boolean customUnlocked = SaveManager.getStars() >= 2;
 
         panel.add(Box.createVerticalGlue());
         panel.add(title);
@@ -496,12 +498,11 @@ public class Main {
         panel.add(nightLabel);
         panel.add(Box.createVerticalStrut(25));
         panel.add(restartBtn);
-        panel.add(Box.createVerticalStrut(15));
-        panel.add(customBtn);
+        if (customUnlocked) {
+            panel.add(Box.createVerticalStrut(15));
+            panel.add(customBtn);
+        }
         panel.add(Box.createVerticalGlue());
-
-        menuFrame.setContentPane(panel);
-        menuFrame.setVisible(true);
 
         new Timer(40, e -> {
             if (hintFadeIn) hintAlpha += 0.02f;
@@ -537,7 +538,13 @@ public class Main {
                 .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = menuFrame.getRootPane().getActionMap();
 
-        List<JLabel> menuItems = List.of(continueBtn, restartBtn, customBtn);
+        List<JLabel> menuItems = new ArrayList<>();
+        menuItems.add(continueBtn);
+        menuItems.add(restartBtn);
+
+        if (customUnlocked) {
+            menuItems.add(customBtn);
+        }
         final int[] selected = {0};
 
         Runnable refreshSelection = () -> {
@@ -594,7 +601,6 @@ public class Main {
             }
         });
 
-        menuFrame.setVisible(true);
         Point base = menuFrame.getLocation();
 
         shakeTimer = new Timer(50, e -> {
@@ -612,6 +618,53 @@ public class Main {
         });
         shakeTimer.start();
 
+        JPanel starsPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Image star = GamePanel.loadStar();
+                if (star == null) return;
+
+                int stars = SaveManager.getStars();
+                int size = 50;
+                int padding = 8;
+
+                Graphics2D g2 = (Graphics2D) g.create();
+                float alpha = 0.7f + (float)Math.sin(System.currentTimeMillis() * 0.005) * 0.3f;
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+
+                for (int i = 0; i < stars; i++) {
+                    g2.drawImage(
+                        star,
+                        padding + i * (size + 6),
+                        padding,
+                        size,
+                        size,
+                        this
+                    );
+                }
+                g2.dispose();
+            }
+        };
+        new Timer(100, e -> starsPanel.repaint()).start();
+
+        JPanel root = new JPanel(new BorderLayout());
+        root.setBackground(Color.BLACK);
+
+        root.add(starsPanel, BorderLayout.NORTH);
+        root.add(panel, BorderLayout.CENTER);
+
+        menuFrame.setContentPane(root);
+        menuFrame.setVisible(true);
+        starsPanel.setOpaque(false);
+        starsPanel.setPreferredSize(new Dimension(120, 100));
+
+        starsPanel.setVisible(true);
+        SwingUtilities.invokeLater(() -> {
+            starsPanel.invalidate();
+            starsPanel.validate();
+            starsPanel.repaint();
+        });
 
     }
 
@@ -656,6 +709,7 @@ public class Main {
         stopRandomSounds();
         SoundManager.stopAll();
         SoundManager.loop("fnaf-music-box-109");
+        SaveManager.load();
 
         if (gameFrame != null) {
             gameFrame.dispose();
@@ -754,7 +808,17 @@ public class Main {
     }
 
     public static void nightWin() {
+        if (currentNight == 5) {
+            SaveManager.unlockStars(1);
+        }
 
+        if (currentNight == 6) {
+            SaveManager.unlockStars(2);
+        }
+
+        if (CustomNightMenu.is_all20()) {
+            SaveManager.unlockStars(3);
+        }
         if (!running) return;
         running = false;
         if (currentNight < 6) {
@@ -762,6 +826,7 @@ public class Main {
             SaveManager.saveNight(currentNight);
         }
         stopRandomSounds();
+        SaveManager.load();
         SoundManager.stopAll();
         SoundManager.play("fnaf-chimes");
 
@@ -831,6 +896,7 @@ public class Main {
     public static void startJumpscare(abstrac_animatronic a) {
         running = false;
         stopRandomSounds();
+        SaveManager.load();
         panel.startSlideJumpscare(a);
     }
 
@@ -882,7 +948,6 @@ public class Main {
         power = 1000 * 60;
         powerOut = false;
         powerOutStart = 0;
-        powerKillTriggered = false;        
         can_play=true;
         SoundManager.loop("Eerie ambience largesca");
         L_a = new L_animatronics();

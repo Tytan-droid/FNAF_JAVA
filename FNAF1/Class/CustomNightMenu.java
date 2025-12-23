@@ -13,7 +13,7 @@ public class CustomNightMenu extends JPanel {
     static final long PRESET_COOLDOWN_MS = 300;
     static long lastPresetTime = 0;
     static boolean presetLocked = false;
-    boolean all20Lock = lastPreset.equals("ALL 20");
+    static boolean all20Lock = lastPreset.equals("ALL 20");
 
     static int[] difficulty = {0, 0, 0, 0, 0};
     static String[] names = {"Freddy", "Bonnie", "Chica", "Foxy", "Golden"};
@@ -238,4 +238,7 @@ public class CustomNightMenu extends JPanel {
         };
     }
 
+    public static boolean is_all20(){
+        return all20Lock;
+    }
 }
