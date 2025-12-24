@@ -2,7 +2,7 @@ package Class.animatronics;
 
 import java.util.Random;
 
-import Class.Main;
+import Class.MainGame;
 import Class.SoundManager;
 import Class.rooms.Rooms_Graph;
 
@@ -33,7 +33,7 @@ public class Foxy extends abstrac_animatronic {
         }else if(this.get_etape_mvt()>=18*60 && this.get_id_room().equals("CAM6")){
             this.run(rg);
         }
-        if (Main.isCam() && Main.getCurrentCamera().equals(id_room)&& id_room.equals("CAM1C")){
+        if (MainGame.isCam() && MainGame.getCurrentCamera().equals(id_room)&& id_room.equals("CAM1C")){
             this.set_etape_mvt(0);
         }
         if(this.get_etape_mvt()==7*60){

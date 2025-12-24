@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.util.Random;
 
 import Class.GamePanel;
-import Class.Main;
+import Class.MainGame;
 import Class.SoundManager;
 import Class.rooms.Rooms_Graph;
 import Class.rooms.abstrac_room;
@@ -78,7 +78,7 @@ public abstract class abstrac_animatronic {
 
     public void kill(){
         if (this.get_id_room().equals("You")){
-            Main.startJumpscare(this);
+            MainGame.startJumpscare(this);
         }
     }
 

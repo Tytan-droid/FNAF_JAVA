@@ -2,7 +2,7 @@ package Class.animatronics;
 
 import java.util.Random;
 
-import Class.Main;
+import Class.MainGame;
 import Class.SoundManager;
 import Class.rooms.Rooms_Graph;
 import Class.rooms.abstrac_room;
@@ -17,7 +17,7 @@ public class Freddy extends abstrac_animatronic {
     public void kill(){
         if ((this.get_id_room().equals("Door_Left"))||this.get_id_room().equals("Door_Right")) {
             this.set_id_room("You");
-            Main.startJumpscare(this);
+            MainGame.startJumpscare(this);
         }
     }
 
@@ -61,7 +61,7 @@ public class Freddy extends abstrac_animatronic {
         }else{
             this.set_etape_mvt(0);
         }
-        if(Main.isCam() && Main.getCurrentCamera().equals(this.get_id_room())){
+        if(MainGame.isCam() && MainGame.getCurrentCamera().equals(this.get_id_room())){
             this.set_etape_mvt(0);
         }
     }

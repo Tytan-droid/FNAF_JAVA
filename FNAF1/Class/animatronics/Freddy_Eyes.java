@@ -2,7 +2,6 @@ package Class.animatronics;
 
 import java.util.Random;
 
-import Class.Main;
 import Class.SoundManager;
 import Class.rooms.Rooms_Graph;
 import Class.rooms.abstrac_room;

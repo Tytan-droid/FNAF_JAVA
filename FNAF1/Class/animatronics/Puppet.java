@@ -2,7 +2,7 @@ package Class.animatronics;
 
 import java.util.List;
 
-import Class.Main;
+import Class.MainGame;
 import Class.SoundManager;
 import Class.rooms.Rooms_Graph;
 
@@ -33,7 +33,7 @@ public class Puppet extends abstrac_animatronic{
             if (this.get_etape_mvt()>=(5-this.get_difficultie()*3/20)*60){
                 if(this.etape>=4){
                     this.is_here=false;
-                    Main.startJumpscare(this);
+                    MainGame.startJumpscare(this);
                 }else if(this.etape==3){
                     SoundManager.play("fnaf-2-music-box");
                     this.etape++;

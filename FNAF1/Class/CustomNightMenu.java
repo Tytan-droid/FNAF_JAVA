@@ -70,7 +70,7 @@ public class CustomNightMenu extends JPanel {
 
         am.put("start", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                Main.startCustomNight(difficulty);
+                MainGame.startCustomNight(difficulty);
             }
         });
     boolean all20Lock = lastPreset.equals("ALL20");
@@ -83,7 +83,7 @@ public class CustomNightMenu extends JPanel {
                 if (w != null) w.dispose();
 
                 SwingUtilities.invokeLater(() -> {
-                    Main.returnToMenu();
+                    MainGame.returnToMenu();
                 });
             }
         });

@@ -2,7 +2,7 @@ package Class.animatronics;
 
 import java.util.Random;
 
-import Class.Main;
+import Class.MainGame;
 import Class.rooms.Rooms_Graph;
 import Class.rooms.abstrac_room;
 
@@ -38,18 +38,18 @@ public class Golden_Freddy extends abstrac_animatronic{
     public void move(Rooms_Graph rg){
         if (this.is_here && this.get_etape_mvt()==3*60){
             this.is_here=false;
-            Main.startJumpscare(this);
+            MainGame.startJumpscare(this);
         }else if(this.is_here && this.get_etape_mvt()<3*60){
             this.set_etape_mvt(this.get_etape_mvt()+1);
         }else{
-            if(Main.isCam()){
+            if(MainGame.isCam()){
                 this.cam_proc=true;
             }else if(cam_proc){
                 this.spawn();
                 cam_proc=false;
             }
         }
-        if(this.is_here && Main.isCam()){
+        if(this.is_here && MainGame.isCam()){
             this.despawn();
         }
     }

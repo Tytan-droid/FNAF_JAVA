@@ -1,5 +1,6 @@
 package Class;
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -109,7 +110,7 @@ public class GamePanel extends JPanel {
     }
 
     private void drawCameraOverlay(Graphics g) {
-        String camId = Main.getCurrentCamera();
+        String camId = MainGame.getCurrentCamera();
         BufferedImage camOverlay2 = loadImage("Cam_commun_overlay.png");
         if (camOverlay != null) {
             g.drawImage(camOverlay2, 0, 0, getWidth(), getHeight(), this);
@@ -198,13 +199,13 @@ public class GamePanel extends JPanel {
             }
         }
         g2d.translate(shakeX, shakeY);
-        L_animatronics la = Main.getAnimatronics();
+        L_animatronics la = MainGame.getAnimatronics();
         java.util.List<abstrac_animatronic> list = la.get_L();
         if (image != null) {
             g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
         }
         try {
-            int pos = Main.getPosition();
+            int pos = MainGame.getPosition();
             Image guard = (pos == 0) ? guardLeft : guardRight;
             if (guard != null) {
                 int targetW = getWidth() / 10;
@@ -220,7 +221,7 @@ public class GamePanel extends JPanel {
                 g.drawImage(guard, x, y, targetW, targetH, this);
                 try {
                     if (la != null) {
-                        if (Main.isLightLeft()) {
+                        if (MainGame.isLightLeft()) {
                             for (abstrac_animatronic a : list) {
                                 if (a == null) continue;
                                 if ("Door_Left".equals(a.get_id_room())) {
@@ -229,7 +230,7 @@ public class GamePanel extends JPanel {
                                 }
                             }
                         }
-                        if (Main.isLightRight()) {
+                        if (MainGame.isLightRight()) {
                             for (abstrac_animatronic a : list) {
                                 if (a == null) continue;
                                 if ("Door_Right".equals(a.get_id_room())) {
@@ -244,8 +245,8 @@ public class GamePanel extends JPanel {
         } catch (Throwable ignored) {}
         
         try {
-            if (Main.isCam()) {
-                String camId = Main.getCurrentCamera();
+            if (MainGame.isCam()) {
+                String camId = MainGame.getCurrentCamera();
                 if (camId != null) { 
                     Image camImg = cameraImages.get(camId);
                     if (camImg == null) {
@@ -303,9 +304,9 @@ public class GamePanel extends JPanel {
                                         if (a == null) continue;
                                         String prev = lastSeenRooms.get(a);
                                         String nowRoom = a.get_id_room();
-                                        if (prev != null && prev.equals(currentCam) && !currentCam.equals(nowRoom) && Main.isCam()) {
+                                        if (prev != null && prev.equals(currentCam) && !currentCam.equals(nowRoom) && MainGame.isCam()) {
                                             try { 
-                                                Main.blinkCamera(400); 
+                                                MainGame.blinkCamera(400); 
                                                 GamePanel.camNoiseStrength = 0.7f;
                                                 GamePanel.camSwitching = true;    
                                             } catch (Throwable ignored) {}
@@ -380,16 +381,16 @@ public class GamePanel extends JPanel {
                                 }
                             }
                         }
-                        if (Main.isCam()) {
+                        if (MainGame.isCam()) {
                             drawStatic(g);
                             applyOldCameraFilter(g);
                             drawCameraSnow(g);
                         }
-                        if (Main.staticActive) {
+                        if (MainGame.staticActive) {
                             drawStatic(g);
 
-                            if (System.currentTimeMillis() - Main.staticStartTime > Main.STATIC_DURATION) {
-                                Main.staticActive = false;
+                            if (System.currentTimeMillis() - MainGame.staticStartTime > MainGame.STATIC_DURATION) {
+                                MainGame.staticActive = false;
                             }
                         }
                     } catch (Throwable ignored) {}
@@ -398,12 +399,12 @@ public class GamePanel extends JPanel {
             }
         } catch (Throwable ignored) {}
         try {
-            boolean leftClose = Main.left_door_close();
-            boolean rightClose = Main.right_door_close();
+            boolean leftClose = MainGame.left_door_close();
+            boolean rightClose = MainGame.right_door_close();
             int panelW = getWidth();
             int panelH = getHeight();
 
-            if (leftClose && !Main.isCam()) {
+            if (leftClose && !MainGame.isCam()) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
                 g2.setColor(Color.GRAY);
@@ -411,7 +412,7 @@ public class GamePanel extends JPanel {
                 g2.dispose();
             }
 
-            if (rightClose && !Main.isCam()) {
+            if (rightClose && !MainGame.isCam()) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
                 g2.setColor(Color.GRAY);
@@ -421,12 +422,12 @@ public class GamePanel extends JPanel {
         } catch (Throwable ignored) {}
 
         try {
-            boolean leftOn = Main.isLightLeft();
-            boolean rightOn = Main.isLightRight();
+            boolean leftOn = MainGame.isLightLeft();
+            boolean rightOn = MainGame.isLightRight();
             int panelW = getWidth();
             int panelH = getHeight();
 
-            if (leftOn && !Main.isCam()) {
+            if (leftOn && !MainGame.isCam()) {
                 if (flashlightLeft != null) {
                     int w = panelW / 3;
                     int iw = flashlightLeft.getWidth(this);
@@ -444,7 +445,7 @@ public class GamePanel extends JPanel {
                 }
             }
 
-            if (rightOn && !Main.isCam()) {
+            if (rightOn && !MainGame.isCam()) {
                 if (flashlightRight != null) {
                     int w = panelW / 3;
                     int iw = flashlightRight.getWidth(this);
@@ -520,7 +521,7 @@ public class GamePanel extends JPanel {
             g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-            int power = Main.getPower();
+            int power = MainGame.getPower();
             int powerPercent = Math.max(0, power / 600);
 
             if (powerPercent > 30) {
@@ -540,7 +541,7 @@ public class GamePanel extends JPanel {
 
             g2.drawString(text, x, y);
 
-            int power_usage = Main.getPowerUsage();
+            int power_usage = MainGame.getPowerUsage();
             power_usage = Math.max(1, power_usage);
 
             g2.setColor(Color.WHITE);
@@ -560,7 +561,7 @@ public class GamePanel extends JPanel {
             g2.setFont(new Font("Arial", Font.BOLD, 32));
             g2.setColor(Color.WHITE);
 
-            String hourText = Main.getHourString();
+            String hourText = MainGame.getHourString();
 
             FontMetrics fm = g2.getFontMetrics();
             int textWidth = fm.stringWidth(hourText);
@@ -593,7 +594,7 @@ public class GamePanel extends JPanel {
             repaint();
         }
         for (abstrac_animatronic a : list) {
-            if (a instanceof Golden_Freddy && !Main.isCam()&& a.get_is_here()) {
+            if (a instanceof Golden_Freddy && !MainGame.isCam()&& a.get_is_here()) {
                 String side ="_Right";
                 String key = "Golden_Freddy" + side;
                 Image animImg = animImages.get(key);
@@ -612,7 +613,7 @@ public class GamePanel extends JPanel {
                     int dy = getHeight()-160;
                     drawAnimAtGuard(g, a, dx, dy, (int)(targetW * 1.5), (int)(targetH * 1.5), true);
                 }
-            }else if (a instanceof Puppet && !Main.isCam()&& a.get_is_here()) {
+            }else if (a instanceof Puppet && !MainGame.isCam()&& a.get_is_here()) {
                 String side ="_Left";
                 String key = "Puppet" + side;
                 Image animImg = animImages.get(key);
@@ -638,8 +639,8 @@ public class GamePanel extends JPanel {
 
     public void jumpscare(Graphics g, abstrac_animatronic a) {
         if (!slideActive || a == null) return;
-        Main.remove_cam();
-        Main.cant_play();
+        MainGame.remove_cam();
+        MainGame.cant_play();
         long elapsed = System.currentTimeMillis() - slideStart;
         float t = Math.min(1f, elapsed / (float) SLIDE_DURATION);
 
@@ -691,7 +692,7 @@ public class GamePanel extends JPanel {
                 shakeStart = System.currentTimeMillis();
             new javax.swing.Timer(300, e -> {
                 ((javax.swing.Timer)e.getSource()).stop();
-                Main.gameOver();
+                MainGame.gameOver();
             }).start();
         }
     }
